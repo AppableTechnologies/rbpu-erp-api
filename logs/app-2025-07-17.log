@@ -1,0 +1,37 @@
+[2025-07-17 09:51:05] INFO: inside refreshAccessToken  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJockBnbWFpbC5jb20iLCJpYXQiOjE3NTI2NDI2ODMsImV4cCI6MTc1MzI0NzQ4M30.4V56EK2PbxT3emqt6BbEGzq7tTlQ8f43m7UWKT9_BGo
+[2025-07-17 09:51:05] INFO: 🍪 Refresh Cookie Present: Yes
+[2025-07-17 09:51:05] INFO: access Token inside refreshAccessToken()  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJockBnbWFpbC5jb20iLCJpYXQiOjE3NTI3MjYwNjUsImV4cCI6MTc1MjcyNzI2NX0.bG-hMZOUzqVRZIUT6KZHI0DiTbj4yEkVfJq-CWspr9o
+[2025-07-17 09:51:06] INFO: inside refreshAccessToken  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJockBnbWFpbC5jb20iLCJpYXQiOjE3NTI2NDI2ODMsImV4cCI6MTc1MzI0NzQ4M30.4V56EK2PbxT3emqt6BbEGzq7tTlQ8f43m7UWKT9_BGo
+[2025-07-17 09:51:06] INFO: 🍪 Refresh Cookie Present: Yes
+[2025-07-17 09:51:06] INFO: access Token inside refreshAccessToken()  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJockBnbWFpbC5jb20iLCJpYXQiOjE3NTI3MjYwNjYsImV4cCI6MTc1MjcyNzI2Nn0.lrCnxPnnY3O0DR90fSzuFXgG8rhRXY0Nnvn4FuHk3Go
+[2025-07-17 09:51:17] INFO: inside getAllCandidates Controller
+[2025-07-17 09:51:31] INFO: inside getAllCandidates Controller
+[2025-07-17 09:59:49] INFO: inside getAllCandidates Controller
+[2025-07-17 10:01:32] INFO: inside getAllCandidates Controller
+[2025-07-17 10:01:44] INFO: inside getAllCandidates Controller
+[2025-07-17 10:04:36] INFO: inside getAllCandidates Controller
+[2025-07-17 10:04:40] INFO: inside getAllCandidates Controller
+[2025-07-17 10:04:41] INFO: inside getAllCandidates Controller
+[2025-07-17 10:05:28] INFO: inside getAllCandidates Controller
+[2025-07-17 10:06:03] INFO: inside getAllCandidates Controller
+[2025-07-17 10:06:34] INFO: inside getAllCandidates Controller
+[2025-07-17 10:06:39] INFO: inside getAllCandidates Controller
+[2025-07-17 10:08:17] INFO: inside getAllCandidates Controller
+[2025-07-17 10:08:59] INFO: inside getAllCandidates Controller
+[2025-07-17 10:10:03] INFO: inside getAllCandidates Controller
+[2025-07-17 10:18:12] INFO:  inside logout() BEFORE clear cookie  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJockBnbWFpbC5jb20iLCJpYXQiOjE3NTI2NDI2ODMsImV4cCI6MTc1MzI0NzQ4M30.4V56EK2PbxT3emqt6BbEGzq7tTlQ8f43m7UWKT9_BGo
+[2025-07-17 10:18:12] INFO:  inside logout() AFTER clear cookie  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJockBnbWFpbC5jb20iLCJpYXQiOjE3NTI2NDI2ODMsImV4cCI6MTc1MzI0NzQ4M30.4V56EK2PbxT3emqt6BbEGzq7tTlQ8f43m7UWKT9_BGo
+[2025-07-17 10:18:22] INFO: 🧠 Login attempt for hr@gmail.com
+[2025-07-17 10:18:22] INFO: 🔑 accessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJockBnbWFpbC5jb20iLCJpYXQiOjE3NTI3Mjc3MDIsImV4cCI6MTc1Mjc0OTMwMn0.vdukDxQRBinaoPMthF6T5FQ7mxWku4jK_5WP3IB-kXE
+[2025-07-17 10:18:22] INFO: 🔁 refreshToken cookie set eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJockBnbWFpbC5jb20iLCJpYXQiOjE3NTI3Mjc3MDIsImV4cCI6MTc1MzMzMjUwMn0.7K7AUApIC9c6ojXZ49Y4hbsbMtoIjxhOq6MYJZeioJY
+[2025-07-17 10:18:22] INFO: 🌐 Headers Sent: {
+  "x-powered-by": "Express",
+  "access-control-allow-origin": "http://localhost:3000",
+  "vary": "Origin",
+  "access-control-allow-credentials": "true",
+  "set-cookie": "refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJockBnbWFpbC5jb20iLCJpYXQiOjE3NTI3Mjc3MDIsImV4cCI6MTc1MzMzMjUwMn0.7K7AUApIC9c6ojXZ49Y4hbsbMtoIjxhOq6MYJZeioJY; Max-Age=604800; Path=/api/auth; Expires=Thu, 24 Jul 2025 04:48:22 GMT; HttpOnly; SameSite=Lax"
+}
+[2025-07-17 10:18:28] INFO:  inside logout() BEFORE clear cookie  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJockBnbWFpbC5jb20iLCJpYXQiOjE3NTI3Mjc3MDIsImV4cCI6MTc1MzMzMjUwMn0.7K7AUApIC9c6ojXZ49Y4hbsbMtoIjxhOq6MYJZeioJY
+[2025-07-17 10:18:28] INFO:  inside logout() AFTER clear cookie  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJockBnbWFpbC5jb20iLCJpYXQiOjE3NTI3Mjc3MDIsImV4cCI6MTc1MzMzMjUwMn0.7K7AUApIC9c6ojXZ49Y4hbsbMtoIjxhOq6MYJZeioJY
+[2025-07-17 10:57:48] INFO: inside refreshAccessToken  undefined
+[2025-07-17 10:57:55] INFO: inside getAllCandidates Controller

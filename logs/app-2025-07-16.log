@@ -1,0 +1,129 @@
+[2025-07-16 09:47:35] INFO: inside refreshAccessToken  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJockBnbWFpbC5jb20iLCJpYXQiOjE3NTI1NjMyNDAsImV4cCI6MTc1MzE2ODA0MH0.bByC8DvNOxsiKHxKSeU6OvWwFCm3a_D5GIwoxKmBfGk
+[2025-07-16 09:47:35] INFO: 🍪 Refresh Cookie Present: Yes
+[2025-07-16 09:47:35] INFO: access Token inside refreshAccessToken()  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJockBnbWFpbC5jb20iLCJpYXQiOjE3NTI2Mzk0NTUsImV4cCI6MTc1MjY0MDY1NX0.a5gNVvKCawr9AgSgq0Pc90M-NrWdZ3Y1sf-qMCFUyrg
+[2025-07-16 09:47:54] INFO: inside getAllCandidates Controller
+[2025-07-16 09:48:36] INFO:  inside logout() BEFORE clear cookie  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJockBnbWFpbC5jb20iLCJpYXQiOjE3NTI1NjMyNDAsImV4cCI6MTc1MzE2ODA0MH0.bByC8DvNOxsiKHxKSeU6OvWwFCm3a_D5GIwoxKmBfGk
+[2025-07-16 09:48:36] INFO:  inside logout() AFTER clear cookie  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJockBnbWFpbC5jb20iLCJpYXQiOjE3NTI1NjMyNDAsImV4cCI6MTc1MzE2ODA0MH0.bByC8DvNOxsiKHxKSeU6OvWwFCm3a_D5GIwoxKmBfGk
+[2025-07-16 10:18:33] INFO: 🧠 Login attempt for hr@gmail.com
+[2025-07-16 10:18:33] INFO: 🔑 accessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJockBnbWFpbC5jb20iLCJpYXQiOjE3NTI2NDEzMTMsImV4cCI6MTc1MjY2MjkxM30.OiMRn92ttpH24oey-lhVhNJ9yD5evsvN4tCX6_M7oUE
+[2025-07-16 10:18:33] INFO: 🔁 refreshToken cookie set eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJockBnbWFpbC5jb20iLCJpYXQiOjE3NTI2NDEzMTMsImV4cCI6MTc1MzI0NjExM30.wrt42Tk9R3bNE1ZlbdF258DiYiM7ivbl6pt2FCMciNI
+[2025-07-16 10:18:33] INFO: 🌐 Headers Sent: {
+  "x-powered-by": "Express",
+  "access-control-allow-origin": "http://localhost:3000",
+  "vary": "Origin",
+  "access-control-allow-credentials": "true",
+  "set-cookie": "refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJockBnbWFpbC5jb20iLCJpYXQiOjE3NTI2NDEzMTMsImV4cCI6MTc1MzI0NjExM30.wrt42Tk9R3bNE1ZlbdF258DiYiM7ivbl6pt2FCMciNI; Max-Age=604800; Path=/api/auth; Expires=Wed, 23 Jul 2025 04:48:33 GMT; HttpOnly; SameSite=Lax"
+}
+[2025-07-16 10:20:10] INFO: inside getAllCandidates Controller
+[2025-07-16 10:20:32] INFO:  inside logout() BEFORE clear cookie  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJockBnbWFpbC5jb20iLCJpYXQiOjE3NTI2NDEzMTMsImV4cCI6MTc1MzI0NjExM30.wrt42Tk9R3bNE1ZlbdF258DiYiM7ivbl6pt2FCMciNI
+[2025-07-16 10:20:32] INFO:  inside logout() AFTER clear cookie  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJockBnbWFpbC5jb20iLCJpYXQiOjE3NTI2NDEzMTMsImV4cCI6MTc1MzI0NjExM30.wrt42Tk9R3bNE1ZlbdF258DiYiM7ivbl6pt2FCMciNI
+[2025-07-16 10:21:50] INFO: inside getAllCandidates Controller
+[2025-07-16 10:21:50] INFO: inside getAllCandidates Controller
+[2025-07-16 10:21:55] INFO: inside getAllCandidates Controller
+[2025-07-16 10:21:55] INFO: inside getAllCandidates Controller
+[2025-07-16 10:21:58] INFO: inside getAllCandidates Controller
+[2025-07-16 10:22:41] INFO: inside getAllCandidates Controller
+[2025-07-16 10:22:41] INFO: inside getAllCandidates Controller
+[2025-07-16 10:23:02] INFO: inside getAllCandidates Controller
+[2025-07-16 10:23:02] INFO: inside getAllCandidates Controller
+[2025-07-16 10:24:52] INFO: inside getAllCandidates Controller
+[2025-07-16 10:41:05] INFO: inside refreshAccessToken  undefined
+[2025-07-16 10:41:07] INFO: inside refreshAccessToken  undefined
+[2025-07-16 10:41:07] INFO: inside refreshAccessToken  undefined
+[2025-07-16 10:41:07] INFO: inside refreshAccessToken  undefined
+[2025-07-16 10:41:07] INFO: inside refreshAccessToken  undefined
+[2025-07-16 10:41:08] INFO: inside refreshAccessToken  undefined
+[2025-07-16 10:41:08] INFO: inside refreshAccessToken  undefined
+[2025-07-16 10:41:12] INFO: inside refreshAccessToken  undefined
+[2025-07-16 10:41:13] INFO: inside refreshAccessToken  undefined
+[2025-07-16 10:41:13] INFO: inside refreshAccessToken  undefined
+[2025-07-16 10:41:22] INFO: 🧠 Login attempt for hr@gmail.com
+[2025-07-16 10:41:23] INFO: 🔑 accessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJockBnbWFpbC5jb20iLCJpYXQiOjE3NTI2NDI2ODMsImV4cCI6MTc1MjY2NDI4M30.HdrjD_Oq5OxXY3iNhOUX24recpqbFvaOCqpnxuTJY24
+[2025-07-16 10:41:23] INFO: 🔁 refreshToken cookie set eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJockBnbWFpbC5jb20iLCJpYXQiOjE3NTI2NDI2ODMsImV4cCI6MTc1MzI0NzQ4M30.4V56EK2PbxT3emqt6BbEGzq7tTlQ8f43m7UWKT9_BGo
+[2025-07-16 10:41:23] INFO: 🌐 Headers Sent: {
+  "x-powered-by": "Express",
+  "access-control-allow-origin": "http://localhost:3000",
+  "vary": "Origin",
+  "access-control-allow-credentials": "true",
+  "set-cookie": "refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJockBnbWFpbC5jb20iLCJpYXQiOjE3NTI2NDI2ODMsImV4cCI6MTc1MzI0NzQ4M30.4V56EK2PbxT3emqt6BbEGzq7tTlQ8f43m7UWKT9_BGo; Max-Age=604800; Path=/api/auth; Expires=Wed, 23 Jul 2025 05:11:23 GMT; HttpOnly; SameSite=Lax"
+}
+[2025-07-16 10:41:26] INFO: inside refreshAccessToken  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJockBnbWFpbC5jb20iLCJpYXQiOjE3NTI2NDI2ODMsImV4cCI6MTc1MzI0NzQ4M30.4V56EK2PbxT3emqt6BbEGzq7tTlQ8f43m7UWKT9_BGo
+[2025-07-16 10:41:26] INFO: 🍪 Refresh Cookie Present: Yes
+[2025-07-16 10:41:26] INFO: access Token inside refreshAccessToken()  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJockBnbWFpbC5jb20iLCJpYXQiOjE3NTI2NDI2ODYsImV4cCI6MTc1MjY0Mzg4Nn0.OsR6RufYDYRoPsZt57ioAQ12zZiI_JhmIALgn2yR2ZI
+[2025-07-16 10:41:27] INFO: inside refreshAccessToken  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJockBnbWFpbC5jb20iLCJpYXQiOjE3NTI2NDI2ODMsImV4cCI6MTc1MzI0NzQ4M30.4V56EK2PbxT3emqt6BbEGzq7tTlQ8f43m7UWKT9_BGo
+[2025-07-16 10:41:27] INFO: 🍪 Refresh Cookie Present: Yes
+[2025-07-16 10:41:27] INFO: access Token inside refreshAccessToken()  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJockBnbWFpbC5jb20iLCJpYXQiOjE3NTI2NDI2ODcsImV4cCI6MTc1MjY0Mzg4N30.my4c1FC0BxwIdtZXoPb6Jh567qdQeIMpI8thi4b8mVk
+[2025-07-16 10:41:28] INFO: inside refreshAccessToken  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJockBnbWFpbC5jb20iLCJpYXQiOjE3NTI2NDI2ODMsImV4cCI6MTc1MzI0NzQ4M30.4V56EK2PbxT3emqt6BbEGzq7tTlQ8f43m7UWKT9_BGo
+[2025-07-16 10:41:28] INFO: 🍪 Refresh Cookie Present: Yes
+[2025-07-16 10:41:28] INFO: access Token inside refreshAccessToken()  eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJockBnbWFpbC5jb20iLCJpYXQiOjE3NTI2NDI2ODgsImV4cCI6MTc1MjY0Mzg4OH0.zU77N5XGKj2_WJgX2cVomk7CyJuOlnPWeS__wZkQduA
+[2025-07-16 10:47:54] INFO: inside getAllCandidates Controller
+[2025-07-16 10:48:23] INFO: inside getAllCandidates Controller
+[2025-07-16 10:52:05] INFO: inside getAllCandidates Controller
+[2025-07-16 10:52:43] INFO: inside getAllCandidates Controller
+[2025-07-16 10:57:00] INFO: inside getAllCandidates Controller
+[2025-07-16 10:57:17] INFO: inside getAllCandidates Controller
+[2025-07-16 10:59:35] INFO: inside getAllCandidates Controller
+[2025-07-16 10:59:38] INFO: inside getAllCandidates Controller
+[2025-07-16 11:01:01] INFO: inside getAllCandidates Controller
+[2025-07-16 11:01:05] INFO: inside getAllCandidates Controller
+[2025-07-16 11:01:53] INFO: inside getAllCandidates Controller
+[2025-07-16 11:02:12] INFO: inside getAllCandidates Controller
+[2025-07-16 11:02:15] INFO: inside getAllCandidates Controller
+[2025-07-16 11:02:20] INFO: inside getAllCandidates Controller
+[2025-07-16 11:02:23] INFO: inside getAllCandidates Controller
+[2025-07-16 11:02:25] INFO: inside getAllCandidates Controller
+[2025-07-16 11:02:32] INFO: inside getAllCandidates Controller
+[2025-07-16 11:02:36] INFO: inside getAllCandidates Controller
+[2025-07-16 11:02:39] INFO: inside getAllCandidates Controller
+[2025-07-16 11:06:13] INFO: inside getAllCandidates Controller
+[2025-07-16 11:06:13] ERROR: ❌ Error in getAllCandidates: Error: connect EHOSTUNREACH 13.233.75.110:5432
+[2025-07-16 11:06:14] ERROR: ❌ Error in getAllDepartments: Error: connect EHOSTUNREACH 13.233.75.110:5432
+[2025-07-16 11:06:20] INFO: inside getAllCandidates Controller
+[2025-07-16 11:06:20] ERROR: ❌ Error in getAllCandidates: Error: connect EHOSTUNREACH 13.233.75.110:5432
+[2025-07-16 11:06:20] ERROR: ❌ Error in getAllDepartments: Error: connect EHOSTUNREACH 13.233.75.110:5432
+[2025-07-16 11:06:26] INFO: inside getAllCandidates Controller
+[2025-07-16 11:06:26] ERROR: ❌ Error in getAllCandidates: Error: connect EHOSTUNREACH 13.233.75.110:5432
+[2025-07-16 11:06:26] ERROR: ❌ Error in getAllDepartments: Error: connect EHOSTUNREACH 13.233.75.110:5432
+[2025-07-16 11:06:29] INFO: inside getAllCandidates Controller
+[2025-07-16 11:06:29] ERROR: ❌ Error in getAllCandidates: Error: connect EHOSTUNREACH 13.233.75.110:5432
+[2025-07-16 11:06:29] ERROR: ❌ Error in getAllDepartments: Error: connect EHOSTUNREACH 13.233.75.110:5432
+[2025-07-16 11:06:36] INFO: inside getAllCandidates Controller
+[2025-07-16 11:06:36] ERROR: ❌ Error in getAllCandidates: Error: connect EHOSTUNREACH 13.233.75.110:5432
+[2025-07-16 11:06:36] ERROR: ❌ Error in getAllDepartments: Error: connect EHOSTUNREACH 13.233.75.110:5432
+[2025-07-16 11:06:39] INFO: inside getAllCandidates Controller
+[2025-07-16 11:06:39] ERROR: ❌ Error in getAllCandidates: Error: connect EHOSTUNREACH 13.233.75.110:5432
+[2025-07-16 11:06:39] ERROR: ❌ Error in getAllDepartments: Error: connect EHOSTUNREACH 13.233.75.110:5432
+[2025-07-16 11:06:43] INFO: inside getAllCandidates Controller
+[2025-07-16 11:06:43] ERROR: ❌ Error in getAllCandidates: Error: connect EHOSTUNREACH 13.233.75.110:5432
+[2025-07-16 11:06:43] ERROR: ❌ Error in getAllDepartments: Error: connect EHOSTUNREACH 13.233.75.110:5432
+[2025-07-16 11:07:47] INFO: inside getAllCandidates Controller
+[2025-07-16 11:07:50] INFO: inside getAllCandidates Controller
+[2025-07-16 11:07:54] INFO: inside getAllCandidates Controller
+[2025-07-16 11:07:58] INFO: inside getAllCandidates Controller
+[2025-07-16 11:08:08] INFO: inside getAllCandidates Controller
+[2025-07-16 11:09:24] INFO: inside getAllCandidates Controller
+[2025-07-16 11:09:31] INFO: inside getAllCandidates Controller
+[2025-07-16 11:09:34] INFO: inside getAllCandidates Controller
+[2025-07-16 11:09:43] INFO: inside getAllCandidates Controller
+[2025-07-16 11:09:46] INFO: inside getAllCandidates Controller
+[2025-07-16 11:09:50] INFO: inside getAllCandidates Controller
+[2025-07-16 11:10:30] INFO: inside getAllCandidates Controller
+[2025-07-16 11:12:15] INFO: inside getAllCandidates Controller
+[2025-07-16 11:15:24] INFO: inside getAllCandidates Controller
+[2025-07-16 11:15:34] INFO: inside getAllCandidates Controller
+[2025-07-16 11:18:27] INFO: inside getAllCandidates Controller
+[2025-07-16 11:19:16] INFO: inside getAllCandidates Controller
+[2025-07-16 11:19:32] INFO: inside getAllCandidates Controller
+[2025-07-16 11:19:35] INFO: inside getAllCandidates Controller
+[2025-07-16 11:22:22] INFO: inside getAllCandidates Controller
+[2025-07-16 17:17:05] INFO: inside getAllCandidates Controller
+[2025-07-16 17:17:36] INFO: inside getAllCandidates Controller
+[2025-07-16 17:22:13] INFO: inside getAllCandidates Controller
+[2025-07-16 17:22:30] INFO: inside getAllCandidates Controller
+[2025-07-16 17:23:35] INFO: inside getAllCandidates Controller
+[2025-07-16 17:23:37] INFO: inside getAllCandidates Controller
+[2025-07-16 17:24:28] INFO: inside getAllCandidates Controller
+[2025-07-16 17:25:08] INFO: inside getAllCandidates Controller
+[2025-07-16 17:25:42] INFO: inside getAllCandidates Controller
+[2025-07-16 17:27:06] INFO: inside getAllCandidates Controller
+[2025-07-16 17:29:09] INFO: inside getAllCandidates Controller
