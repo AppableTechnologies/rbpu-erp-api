@@ -2,11 +2,8 @@ const express = require("express");
 const router = express.Router();
 const careerCandidateRouter = require("./user_router");
 const menusRouter = require("./menus_router");
-const facultiesRouter = require("../routers/academic/faculties_router");
-const programsRouter = require('../routers/academic/programs_router');
-const classroomRouter = require("../routers/academic/classroom_router");
-
-
+const facultiesRouter = require("./academic/faculties_router");
+const programsRouter = require('./academic/programs_router');
 router.use("/api/users", careerCandidateRouter);
 router.use("/api/menus", menusRouter);
 
