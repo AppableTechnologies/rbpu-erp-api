@@ -1,5 +1,3 @@
-const express  =  require("express");
-const { writeLog } = require("../utils/logger");
 const {pgPool} = require("../pg_constant");
 
 

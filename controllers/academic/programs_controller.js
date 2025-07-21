@@ -1,4 +1,4 @@
-const { pgPool } = require("../pg_constant");
+const { pgPool } = require("../../pg_constant");
 module.exports = {
   getPrograms: async (req, res) => {
     try {
