@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { getFaculties,createFaculty,updateFaculty,deleteFaculty } = require("../controllers/faculties_controller");
+const { getFaculties,createFaculty,updateFaculty,deleteFaculty } = require("../../controllers/academic/faculties_controller");
 
 router.get("/", getFaculties);
 
