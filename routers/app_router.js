@@ -9,6 +9,7 @@ router.use("/api/menus", menusRouter);
 
 router.use("/api/faculties",facultiesRouter);
 router.use("/api/programs",programsRouter);
+router.use("/api/classrooms",classroomRouter);
 
 router.get("/api/test", (req, res) => res.send("✅ Working"));
 

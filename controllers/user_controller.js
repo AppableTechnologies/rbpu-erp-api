@@ -3,7 +3,7 @@
 const { pgPool } = require("../pg_constant");
 const argon2 = require('argon2');
 const jwt = require("jsonwebtoken");
-const { writeLog } = require("../utils/logger");
+const  writeLog  = require("../utils/logger");
 
 
 module.exports.userLogin = async function userLogin(req, res) {
