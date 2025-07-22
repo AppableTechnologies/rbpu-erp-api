@@ -5,7 +5,7 @@ module.exports = {
       const query = `
   SELECT
     programs.id AS program_id,
-    programs.title AS program_title,
+    programs.title,
     faculties.id AS faculty_id,
     faculties.title AS faculty_title,
     programs.slug,
