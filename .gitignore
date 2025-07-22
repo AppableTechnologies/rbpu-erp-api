@@ -12,7 +12,7 @@
 
 # testing
 /coverage
-
+/logs
 /out/
 
 # production
