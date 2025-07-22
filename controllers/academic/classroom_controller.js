@@ -3,10 +3,48 @@ const { pgPool } = require("../../pg_constant");
 const { generateSlug } = require("../../utils/helpers");
 
 const getClassrooms = async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const offset = (page - 1) * limit;
+
+  logger.log("info", "inside getClassrooms Controller");
   try {
-    logger.log("info", "inside getClassrooms Controller");
-    const classrooms = await pgPool.query("SELECT * FROM class_rooms");
-    res.json(classrooms.rows);
+    if (page < 1 || limit < 1) {
+      return res.status(400).json({ error: "Invalid page or limit" });
+    }
+    const result = await pgPool.query(
+      "SELECT * FROM class_rooms ORDER BY id LIMIT $1 OFFSET $2",
+      [limit, offset]
+    );
+
+    // Count total entries (for pagination)
+    const countResult = await pgPool.query("SELECT COUNT(*) FROM class_rooms");
+    const totalItems = parseInt(countResult.rows[0].count);
+    const totalPages = Math.ceil(totalItems / limit);
+
+    
+    if (page > totalPages && totalItems > 0) {
+       return res.status(404).json({
+        error: `Current Page ${page} exceed total records ${totalItems} limit ${limit}`,
+        pagination: {
+          totalItems,
+          totalPages,
+          currentPage: page,
+          limit,
+        },
+      });
+    }
+
+    // res.json(classrooms.rows);
+    res.json({
+      data: result.rows,
+      pagination: {
+        totalItems,
+        totalPages,
+        currentPage: page,
+        limit,
+      },
+    });
   } catch (error) {
     logger.error("Error fetching classrooms:", error);
     res.status(500).json({ error: "Failed to fetch classrooms" });
