@@ -26,6 +26,7 @@
             "hash": "a8d415b3035e58b62bedb6429da0373f9d6854a2575ede2d14b1bb030e609a40"
         },
         {
+<<<<<<< HEAD
             "date": 1753079441298,
             "name": "logs\\app-2025-07-21.log",
             "hash": "9997a545cf462076a09b882d65b69b6e7ba7db4371fea8318b5ce3d8f4451549"
@@ -35,6 +36,9 @@
             "name": "logs\\app-2025-07-22.log",
             "hash": "be0c636119e2477f1b86da2db4b2ba3482ee4dfe2b5858cc2d2f86fd9f98ae78"
         }
+=======
+
+>>>>>>> 1ee56692ae2d6b38ea0b8f67a697a849adb41ca0
     ],
     "hashType": "sha256"
 }
