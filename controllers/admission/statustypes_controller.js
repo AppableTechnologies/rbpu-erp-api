@@ -2,16 +2,70 @@ const { pgPool } = require("../../pg_constant");
 
 module.exports = {
 
+  // getStatusTypes: async (req, res) => {
+  //   try {
+  //     const query = `SELECT id, title, slug, description, status FROM status_types ORDER BY id ASC;`;
+  //     const result = await pgPool.query(query);
+  //     return res.status(200).json(result.rows);
+  //   } catch (error) {
+  //     console.error('Error fetching status types:', error);
+  //     return res.status(500).json({ message: 'Server error while fetching status types' });
+  //   }
+  // },
+
   getStatusTypes: async (req, res) => {
-    try {
-      const query = `SELECT id, title, slug, description, status FROM status_types ORDER BY id ASC;`;
-      const result = await pgPool.query(query);
-      return res.status(200).json(result.rows);
-    } catch (error) {
-      console.error('Error fetching status types:', error);
-      return res.status(500).json({ message: 'Server error while fetching status types' });
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const offset = (page - 1) * limit;
+
+  try {
+    if (page < 1 || limit < 1) {
+      return res.status(400).json({ error: "Invalid page or limit" });
     }
-  },
+
+    // Get paginated data
+    const dataQuery = `
+      SELECT id, title, slug, description, status
+      FROM status_types
+      ORDER BY id ASC
+      LIMIT $1 OFFSET $2;
+    `;
+    const dataResult = await pgPool.query(dataQuery, [limit, offset]);
+
+    // Get total count
+    const countQuery = `SELECT COUNT(*) FROM status_types;`;
+    const countResult = await pgPool.query(countQuery);
+    const totalItems = parseInt(countResult.rows[0].count);
+    const totalPages = Math.ceil(totalItems / limit);
+
+    if (page > totalPages && totalItems > 0) {
+      return res.status(404).json({
+        error: `Current Page ${page} exceeds total records ${totalItems} with limit ${limit}`,
+        pagination: {
+          totalItems,
+          totalPages,
+          currentPage: page,
+          limit,
+        },
+      });
+    }
+
+    return res.status(200).json({
+      data: dataResult.rows,
+      pagination: {
+        totalItems,
+        totalPages,
+        currentPage: page,
+        limit,
+      },
+    });
+
+  } catch (error) {
+    console.error("Error fetching status types:", error);
+    return res.status(500).json({ message: "Server error while fetching status types" });
+  }
+}
+,
 
   createStatusType: async (req, res) => {
     const { title, description } = req.body;
