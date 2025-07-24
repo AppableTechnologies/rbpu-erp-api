@@ -1,32 +1,68 @@
 const { pgPool } = require("../../pg_constant");
 module.exports = {
-  getPrograms: async (req, res) => {
-    try {
-      const query = `
-  SELECT
-    programs.id AS program_id,
-    programs.title,
-    faculties.id AS faculty_id,
-    faculties.title AS faculty_title,
-    programs.slug,
-    programs.shortcode,
-    programs.registration,
-    programs.status,
-    programs.created_at,
-    programs.updated_at
-  FROM programs
-  LEFT JOIN faculties ON programs.faculty_id = faculties.id
-  ORDER BY programs.id ASC;
-`;
-      const result = await pgPool.query(query);
-      return res.status(200).json(result.rows);
-    } catch (error) {
-      console.error("Error fetching programs:", error);
-      return res
-        .status(500)
-        .json({ message: "Server error while fetching programs" });
+getPrograms: async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const offset = (page - 1) * limit;
+
+  try {
+    if (page < 1 || limit < 1) {
+      return res.status(400).json({ error: "Invalid page or limit" });
     }
-  },
+
+    const dataQuery = `
+      SELECT
+        programs.id AS program_id,
+        programs.title,
+        faculties.id AS faculty_id,
+        faculties.title AS faculty_title,
+        programs.slug,
+        programs.shortcode,
+        programs.registration,
+        programs.status,
+        programs.created_at,
+        programs.updated_at
+      FROM programs
+      LEFT JOIN faculties ON programs.faculty_id = faculties.id
+      ORDER BY programs.id ASC
+      LIMIT $1 OFFSET $2;
+    `;
+    const dataResult = await pgPool.query(dataQuery, [limit, offset]);
+
+    // Get total count
+    const countQuery = `SELECT COUNT(*) FROM programs;`;
+    const countResult = await pgPool.query(countQuery);
+    const totalItems = parseInt(countResult.rows[0].count);
+    const totalPages = Math.ceil(totalItems / limit);
+
+    if (page > totalPages && totalItems > 0) {
+      return res.status(404).json({
+        error: `Current Page ${page} exceeds total records ${totalItems} with limit ${limit}`,
+        pagination: {
+          totalItems,
+          totalPages,
+          currentPage: page,
+          limit,
+        },
+      });
+    }
+
+    return res.status(200).json({
+      data: dataResult.rows,
+      pagination: {
+        totalItems,
+        totalPages,
+        currentPage: page,
+        limit,
+      },
+    });
+
+  } catch (error) {
+    console.error("Error fetching programs:", error);
+    return res.status(500).json({ message: "Server error while fetching programs" });
+  }
+}
+,
   createPrograms: async (req, res) => {
     try {
       const { title, shortcode, faculty_id } = req.body;
