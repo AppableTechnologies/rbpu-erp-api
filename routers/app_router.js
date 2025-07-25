@@ -8,7 +8,7 @@ const programsRouter = require('./academic/programs_router');
 const classroomRouter = require("./academic/classroom_router");
 const statustypesRouter = require("./admission/statustypes_router")
 const batchesRouter = require("./academic/batches_router");
-const studentsRouter = require("./academic/student_routers");
+const studentsRouter = require("./admission/student_registration_routers");
 
 router.use("/api/users", careerCandidateRouter);
 router.use("/api/menus", menusRouter);
