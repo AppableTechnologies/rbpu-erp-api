@@ -3,19 +3,22 @@ const router = express.Router();
 const careerCandidateRouter = require("./user_router");
 const menusRouter = require("./menus_router");
 const facultiesRouter = require("./academic/faculties_router");
-const programsRouter = require('./academic/programs_router');
+const programsRouter = require("./academic/programs_router");
 const classroomRouter = require("./academic/classroom_router");
 const batchesRouter = require("./academic/batches_router");
+const studentsRouter = require("./academic/student_routers");
+const sessionRouter = require("./academic/session_router");
 
 router.use("/api/users", careerCandidateRouter);
 router.use("/api/menus", menusRouter);
 
-router.use("/api/faculties",facultiesRouter);
-router.use("/api/programs",programsRouter);
-router.use("/api/classrooms",classroomRouter);
-router.use("/api/batches",batchesRouter);
+router.use("/api/faculties", facultiesRouter);
+router.use("/api/programs", programsRouter);
+router.use("/api/classrooms", classroomRouter);
+router.use("/api/batches", batchesRouter);
+router.use("/api/students", studentsRouter);
+router.use("/api/sessions", sessionRouter);
 
 router.get("/api/test", (req, res) => res.send("✅ Working"));
-
 
 module.exports = router;

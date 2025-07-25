@@ -181,7 +181,7 @@ const createStudent = async (req, res) => {
 };
 
 
-const updateStudent = async (req, res) => {
+const updateStudent = async (req, res) => { 
   const { id } = req.params;
   const {
     phone,

@@ -36,7 +36,7 @@ const getClassrooms = async (req, res) => {
     }
 
     // res.json(classrooms.rows);
-    res.json({
+   return res.status(200).json({
       data: result.rows,
       pagination: {
         totalItems,
