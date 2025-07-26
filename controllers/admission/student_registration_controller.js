@@ -1,5 +1,6 @@
 const logger = require("../../utils/logger");
 const { pgPool } = require("../../pg_constant");
+const { upload, uploadDir } = require("../../middlewares/multer");
 
 const getStudents = async (req, res) => {
   const page = parseInt(req.query.page) || 1;
