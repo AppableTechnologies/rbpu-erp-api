@@ -48,16 +48,16 @@ const getSessions = async (req, res) => {
   }
 };
 
-// const createSession = async (req, res) => {
-
-//     try {
+const createSession = async (req, res) => {
+    
+    try {
         
-//     } catch (error) {
-//         logger.log
-//     }
+    } catch (error) {
+        logger.log
+    }
 
 
-// };
+};
 
 
 module.exports = {
