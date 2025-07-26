@@ -10,12 +10,12 @@ const {
 
 router.get("/", getStudents);
 router.post(
-  "/students",
+  "/create",
   upload.fields([
     { name: "photo", maxCount: 1 },
     { name: "signature", maxCount: 1 },
   ]),
-  createStudent
+  createStudent 
 );
 router.put("/update/:id", updateStudent);
 router.delete("/delete/:id", deleteStudent);
