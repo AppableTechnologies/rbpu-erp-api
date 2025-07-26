@@ -10,6 +10,7 @@ const statustypesRouter = require("./admission/statustypes_router")
 const batchesRouter = require("./academic/batches_router");
 const studentsRouter = require("./admission/student_registration_routers");
 const sessionRouter = require("./academic/session_router");
+const dropdownRouter = require("./common/dropdown_router");
 
 
 router.use("/api/users", careerCandidateRouter);
@@ -22,6 +23,7 @@ router.use("/api/statustypes",statustypesRouter)
 router.use("/api/batches",batchesRouter);
 router.use("/api/students", studentsRouter);
 router.use("/api/sessions", sessionRouter);
+router.use("/api/common/dropdown", dropdownRouter);
 
 
 router.get("/api/test", (req, res) => res.send("✅ Working"));
