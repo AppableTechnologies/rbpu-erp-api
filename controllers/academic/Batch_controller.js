@@ -1,80 +1,108 @@
 const { pgPool } = require("../../pg_constant");
 
 module.exports = {
-  getBatches: async (req, res) => {
+getBatches: async (req, res) => {
     const all = req.query.all === "true";
     const page = parseInt(req.query.page) || 1;
     const limit = all ? null : parseInt(req.query.limit) || 10;
     const offset = (page - 1) * (limit || 0);
 
     try {
-      let dataQuery, dataParams;
+        if (all) {
+            // For all batches (no pagination)
+            const dataQuery = `
+                SELECT 
+                    bt.id AS batch_id,
+                    bt.title AS batches_title, 
+                    bt.start_date,
+                    bt.status,
+                    bt.created_at,
+                    bt.updated_at,
+                    json_agg(
+                        json_build_object(
+                            'program_id', p.id,
+                            'program_title', p.title
+                        )
+                    ) AS programs
+                FROM batches bt
+                LEFT JOIN batch_program bp ON bt.id = bp.batch_id
+                LEFT JOIN programs p ON bp.program_id = p.id
+                GROUP BY bt.id
+                ORDER BY bt.id ASC;
+            `;
+            
+            const dataResult = await pgPool.query(dataQuery);
+            return res.status(200).json({ data: dataResult.rows });
+        } else {
+            // For paginated batches
+            // First get the batch IDs for the current page
+            const batchIdsQuery = `
+                SELECT id FROM batches
+                ORDER BY id ASC
+                LIMIT $1 OFFSET $2;
+            `;
+            
+            const batchIdsResult = await pgPool.query(batchIdsQuery, [limit, offset]);
+            const batchIds = batchIdsResult.rows.map(row => row.id);
 
-      if (all) {
-        dataQuery = `
-        SELECT 
-          bt.id AS batch_id,
-          bt.title AS batches_title, 
-          bt.start_date,
-          bt.status,
-          bt.created_at,
-          bt.updated_at,
-          bp.program_id,
-          p.title AS program_title
-        FROM batches bt
-        LEFT JOIN batch_program bp ON bt.id = bp.batch_id
-        LEFT JOIN programs p ON bp.program_id = p.id
-        ORDER BY bt.id ASC;
-      `;
-        dataParams = [];
-      } else {
-        dataQuery = `
-        SELECT 
-          bt.id AS batch_id,
-          bt.title AS batches_title, 
-          bt.start_date,
-          bt.status,
-          bt.created_at,
-          bt.updated_at,
-          bp.program_id,
-          p.title AS program_title
-        FROM batches bt
-        LEFT JOIN batch_program bp ON bt.id = bp.batch_id
-        LEFT JOIN programs p ON bp.program_id = p.id
-        ORDER BY bt.id ASC
-        LIMIT $1 OFFSET $2;
-      `;
-        dataParams = [limit, offset];
-      }
+            if (batchIds.length === 0) {
+                return res.status(200).json({
+                    data: [],
+                    pagination: {
+                        totalItems: 0,
+                        totalPages: 0,
+                        currentPage: page,
+                        limit
+                    }
+                });
+            }
 
-      const dataResult = await pgPool.query(dataQuery, dataParams);
+            // Then get the full batch data with programs for these IDs
+            const dataQuery = `
+                SELECT 
+                    bt.id AS batch_id,
+                    bt.title AS batches_title, 
+                    bt.start_date,
+                    bt.status,
+                    bt.created_at,
+                    bt.updated_at,
+                    json_agg(
+                        json_build_object(
+                            'program_id', p.id,
+                            'program_title', p.title
+                        )
+                    ) AS programs
+                FROM batches bt
+                LEFT JOIN batch_program bp ON bt.id = bp.batch_id
+                LEFT JOIN programs p ON bp.program_id = p.id
+                WHERE bt.id = ANY($1)
+                GROUP BY bt.id
+                ORDER BY bt.id ASC;
+            `;
+            
+            const dataResult = await pgPool.query(dataQuery, [batchIds]);
 
-      if (all) {
-        return res.status(200).json({ data: dataResult.rows });
-      }
+            // Count total batches (for pagination)
+            const countQuery = `SELECT COUNT(*) FROM batches;`;
+            const countResult = await pgPool.query(countQuery);
+            const totalItems = parseInt(countResult.rows[0].count);
+            const totalPages = Math.ceil(totalItems / limit);
 
-      // Count total batches (for pagination)
-      const countQuery = `SELECT COUNT(*) FROM batches;`;
-      const countResult = await pgPool.query(countQuery);
-      const totalItems = parseInt(countResult.rows[0].count);
-      const totalPages = Math.ceil(totalItems / limit);
-
-      return res.status(200).json({
-        data: dataResult.rows,
-        pagination: {
-          totalItems,
-          totalPages,
-          currentPage: page,
-          limit,
-        },
-      });
+            return res.status(200).json({
+                data: dataResult.rows,
+                pagination: {
+                    totalItems,
+                    totalPages,
+                    currentPage: page,
+                    limit,
+                },
+            });
+        }
     } catch (error) {
-      console.error("Error fetching batches:", error);
-      return res
-        .status(500)
-        .json({ message: "Server error while fetching batches" });
+        console.error("Error fetching batches:", error);
+        return res.status(500).json({ message: "Server error while fetching batches" });
     }
-  },
+},
   createBatch: async (req, res) => {
     const { title, start_date, program_ids, status = true } = req.body;
 
