@@ -1,35 +1,63 @@
 const { pgPool } = require("../../pg_constant");
 module.exports = {
 getPrograms: async (req, res) => {
+  const all = req.query.all === 'true';
   const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 10;
-  const offset = (page - 1) * limit;
+  const limit = all ? null : parseInt(req.query.limit) || 10;
+  const offset = all ? 0 : (page - 1) * (limit || 0);
 
   try {
-    if (page < 1 || limit < 1) {
-      return res.status(400).json({ error: "Invalid page or limit" });
+    let dataQuery, dataParams;
+
+    if (all) {
+      dataQuery = `
+        SELECT
+          programs.id AS program_id,
+          programs.title,
+          faculties.id AS faculty_id,
+          faculties.title AS faculty_title,
+          programs.slug,
+          programs.shortcode,
+          programs.registration,
+          programs.status,
+          programs.created_at,
+          programs.updated_at
+        FROM programs
+        LEFT JOIN faculties ON programs.faculty_id = faculties.id
+        ORDER BY programs.id ASC;
+      `;
+      dataParams = [];
+    } else {
+      dataQuery = `
+        SELECT
+          programs.id AS program_id,
+          programs.title,
+          faculties.id AS faculty_id,
+          faculties.title AS faculty_title,
+          programs.slug,
+          programs.shortcode,
+          programs.registration,
+          programs.status,
+          programs.created_at,
+          programs.updated_at
+        FROM programs
+        LEFT JOIN faculties ON programs.faculty_id = faculties.id
+        ORDER BY programs.id ASC
+        LIMIT $1 OFFSET $2;
+      `;
+      dataParams = [limit, offset];
     }
 
-    const dataQuery = `
-      SELECT
-        programs.id AS program_id,
-        programs.title,
-        faculties.id AS faculty_id,
-        faculties.title AS faculty_title,
-        programs.slug,
-        programs.shortcode,
-        programs.registration,
-        programs.status,
-        programs.created_at,
-        programs.updated_at
-      FROM programs
-      LEFT JOIN faculties ON programs.faculty_id = faculties.id
-      ORDER BY programs.id ASC
-      LIMIT $1 OFFSET $2;
-    `;
-    const dataResult = await pgPool.query(dataQuery, [limit, offset]);
+    const dataResult = await pgPool.query(dataQuery, dataParams);
 
-    // Get total count
+    if (all) {
+      return res.status(200).json({ 
+        data: dataResult.rows,
+        pagination: null
+      });
+    }
+
+    // For paginated results only
     const countQuery = `SELECT COUNT(*) FROM programs;`;
     const countResult = await pgPool.query(countQuery);
     const totalItems = parseInt(countResult.rows[0].count);
@@ -37,7 +65,7 @@ getPrograms: async (req, res) => {
 
     if (page > totalPages && totalItems > 0) {
       return res.status(404).json({
-        error: `Current Page ${page} exceeds total records ${totalItems} with limit ${limit}`,
+        error: `Page ${page} not found. Total pages: ${totalPages}`,
         pagination: {
           totalItems,
           totalPages,
