@@ -261,8 +261,8 @@ const updateSession = async (req, res) => {
   if (
     !title ||
     !start_date ||
-    !end_date ||
-    !current ||
+    // !end_date ||
+    // !current ||
     !Array.isArray(program_ids) ||
     program_ids.length === 0
   ) {
@@ -286,6 +286,7 @@ const updateSession = async (req, res) => {
    WHERE id = $6`,
       [title, start_date, end_date, current, status, sessionId]
     );
+    
 
     // Delete existing program links
     await pgPool.query("DELETE FROM program_session WHERE session_id = $1", [
@@ -310,8 +311,34 @@ const updateSession = async (req, res) => {
   }
 };
 
+const deleteSession = async (req, res) => {
+  const sessionId = req.params.sessionId;
+  try {
+    const sessionCheck = await pgPool.query(
+      "SELECT * FROM sessions WHERE id = $1",
+      [sessionId]
+    );
+    if (sessionCheck.rowCount === 0) {
+      return res.status(404).json({ error: "Session not found." });
+    }
+    await pgPool.query("DELETE FROM program_session WHERE session_id = $1", [
+      sessionId,
+    ]);
+    await pgPool.query("DELETE FROM sessions WHERE id = $1", [sessionId]);
+    return res.status(200).json({
+      message: "Session and associated programs deleted successfully.",
+    });
+  } catch (error) {
+    console.error("Error deleting session:", error);
+    return res
+      .status(500)
+      .json({ message: "Server error while deleting session" });
+  }
+};
+
 module.exports = {
   getSessions,
   createSession,
   updateSession,
+  deleteSession,
 };
