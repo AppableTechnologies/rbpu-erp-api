@@ -174,7 +174,16 @@ getBatches: async (req, res) => {
         .status(400)
         .json({ error: "Missing required fields or empty program list." });
     }
+ const duplicateCheck = await pgPool.query(
+            "SELECT id FROM batches WHERE title = $1 AND  id != $2",
+            [title, batchId]
+        );
 
+        if (duplicateCheck.rowCount > 0) {
+            return res.status(409).json({
+                error: "Another batch with the same title already exists.",
+            });
+        }
     try {
       const batchCheck = await pgPool.query(
         "SELECT * FROM batches WHERE id = $1",

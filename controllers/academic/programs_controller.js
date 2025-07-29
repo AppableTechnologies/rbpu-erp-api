@@ -140,6 +140,23 @@ getPrograms: async (req, res) => {
   const { id } = req.params;
   const { title, shortcode, status, faculty_id } = req.body;
   const slug = title.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
+  
+  if (!title || (shortcode && typeof shortcode !== 'string')) {
+    return res.status(400).json({ message: 'Missing required fields' });
+    
+  }
+
+  const duplicateCheck = await pgPool.query(
+            "SELECT id FROM programs  WHERE title = $1 AND  id != $2",
+            [title, id]
+        );
+
+        if (duplicateCheck.rowCount > 0) {
+            return res.status(409).json({
+                error: "Another program with the same title already exists.",
+            });
+        }
+  
   try {
     const facultyCheck = await pgPool.query(
       "SELECT id FROM faculties WHERE id = $1",
