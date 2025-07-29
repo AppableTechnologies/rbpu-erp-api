@@ -271,6 +271,17 @@ const updateSession = async (req, res) => {
       .json({ error: "Missing required fields or empty program list." });
   }
 
+
+    const duplicateCheck = await pgPool.query(
+            "SELECT id FROM sessions WHERE title = $1 AND  id != $2",
+            [title, sessionId]
+        );
+
+        if (duplicateCheck.rowCount > 0) {
+            return res.status(409).json({
+                error: "Another session with the same title already exists.",
+            });
+        }
   try {
     const sessionCheck = await pgPool.query(
       "SELECT * FROM sessions WHERE id = $1",

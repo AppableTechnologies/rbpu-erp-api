@@ -12,6 +12,7 @@ const studentsRouter = require("./admission/student_registration_routers");
 const sessionRouter = require("./academic/session_router");
 const dropdownRouter = require("./common/dropdown_router");
 const  getSemester  = require("./academic/Semesters_routes");
+const getSections = require("./academic/section_router");
 
 router.use("/api/users", careerCandidateRouter);
 router.use("/api/menus", menusRouter);
@@ -24,8 +25,8 @@ router.use("/api/batches",batchesRouter);
 router.use("/api/students", studentsRouter);
 router.use("/api/sessions", sessionRouter);
 router.use("/api/common/dropdown", dropdownRouter);
-
 router.use("/api/semesters", getSemester);
+router.use("/api/sections", getSections);
 
 
 router.get("/api/test", (req, res) => res.send("✅ Working"));
