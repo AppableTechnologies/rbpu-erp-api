@@ -28,7 +28,4 @@ router.use("/api/common/dropdown", dropdownRouter);
 router.use("/api/semesters", getSemester);
 router.use("/api/sections", getSections);
 
-
-router.get("/api/test", (req, res) => res.send("✅ Working"));
-
 module.exports = router;

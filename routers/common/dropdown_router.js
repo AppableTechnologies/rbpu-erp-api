@@ -8,7 +8,6 @@ const {
   getSectionDropdown,
   getStatusTypesDropdown,
 } = require("../../controllers/common/dropdown_controller");
-const { getStatusTypes } = require("../../controllers/admission/statustypes_controller");
 
 dropdownRouter.get("/batches", getBatchesDropdown);
 dropdownRouter.get("/programs", getProgramsDropdown);
