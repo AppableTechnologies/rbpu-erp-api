@@ -6,6 +6,7 @@ const {
   createStudent,
   updateStudent,
   deleteStudent,
+  uploadStudentDocuments,
 } = require("../../controllers/admission/student_registration_controller");
 
 router.get("/", getStudents);

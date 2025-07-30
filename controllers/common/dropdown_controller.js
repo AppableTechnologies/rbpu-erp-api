@@ -29,6 +29,9 @@ const getSemesterDropdown = async (req, res) => {
 const getSectionDropdown = async (req, res) => {
   getDynamicDropdown(req, res, "sections");
 };
+const getFacultyDropdown = async (req, res) => {
+  getDynamicDropdown(req, res, "faculties");
+};
 
 module.exports = {
   getBatchesDropdown,
@@ -36,4 +39,5 @@ module.exports = {
   getSessionDropdown,
   getSemesterDropdown,
   getSectionDropdown,
+  getFacultyDropdown,
 };
