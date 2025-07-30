@@ -22,9 +22,8 @@ const getClassrooms = async (req, res) => {
     const totalItems = parseInt(countResult.rows[0].count);
     const totalPages = Math.ceil(totalItems / limit);
 
-    
     if (page > totalPages && totalItems > 0) {
-       return res.status(404).json({
+      return res.status(404).json({
         error: `Current Page ${page} exceed total records ${totalItems} limit ${limit}`,
         pagination: {
           totalItems,
@@ -36,7 +35,7 @@ const getClassrooms = async (req, res) => {
     }
 
     // res.json(classrooms.rows);
-    res.json({
+    return res.status(200).json({
       data: result.rows,
       pagination: {
         totalItems,
@@ -92,6 +91,19 @@ const updateClassroom = async (req, res) => {
   const { id } = req.params;
   const { room_no, floor, capacity, type, status } = req.body;
   const slug = generateSlug(room_no);
+  if (!room_no || !floor || !capacity || !type || !status) {
+    return res.status(400).json({ message: "All fields are required" });
+  }
+   const duplicateCheck = await pgPool.query(
+            "SELECT id FROM class_rooms WHERE room_no = $1 AND  id != $2",
+            [room_no, id]
+        );
+
+        if (duplicateCheck.rowCount > 0) {
+            return res.status(409).json({
+                error: "Another classroom with the same title already exists.",
+            });
+        }
 
   try {
     const query = `

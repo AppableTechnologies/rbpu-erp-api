@@ -98,7 +98,21 @@ createFaculty: async (req, res) => {
     const { title, shortcode, status } = req.body;
       const slug = title.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
 
-    
+    if (!title  || (shortcode && typeof shortcode !== 'string')) {
+      return res.status(400).json({ message: 'Missing required fields' });
+      
+    }
+     const duplicateCheck = await pgPool.query(
+            "SELECT id FROM faculties WHERE title = $1 AND  id != $2",
+            [title, id]
+        );
+
+        if (duplicateCheck.rowCount > 0) {
+            return res.status(409).json({
+                error: "Another faculty with the same title already exists.",
+            });
+        }
+
     try {
       const query = `
         UPDATE faculties
