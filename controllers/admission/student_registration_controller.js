@@ -198,6 +198,8 @@ const getStudents = async (req, res) => {
 
 
 //made changes in quer formation of student registration
+
+
 const createStudent = async (req, res) => {
   try {
     logger.log("info", "inside createStudent Controller");
@@ -230,6 +232,7 @@ const createStudent = async (req, res) => {
       marital_status,
       blood_group,
       nationality,
+      national_id,
       passport_no,
       school_name,
       school_exam_id,
@@ -270,12 +273,12 @@ const createStudent = async (req, res) => {
 
     const photo = saveFile(req.files?.photo?.[0], "photo");
     const signature = saveFile(req.files?.signature?.[0], "signature");
-    const school_transcript = saveFile(req.files?.school_transcript?.[0], "school_transcript");
-    const school_certificate = saveFile(req.files?.signature?.[0], "school_certificate");
-    const collage_transcript = saveFile(req.files?.signature?.[0], "collage_transcript");
-    const collage_certificate = saveFile(req.files?.signature?.[0], "collage_certificate");
-    const father_photo = saveFile(req.files?.signature?.[0], "father_photo");
-    const mother_photo = saveFile(req.files?.signature?.[0], "mother_photo");
+    // const school_transcript = saveFile(req.files?.school_transcript?.[0], "school_transcript");
+    // const school_certificate = saveFile(req.files?.signature?.[0], "school_certificate");
+    // const collage_transcript = saveFile(req.files?.signature?.[0], "collage_transcript");
+    // const collage_certificate = saveFile(req.files?.signature?.[0], "collage_certificate");
+    // const father_photo = saveFile(req.files?.signature?.[0], "father_photo");
+    // const mother_photo = saveFile(req.files?.signature?.[0], "mother_photo");
 
     // Check if student already exists
     const checkQuery = `SELECT * FROM students WHERE student_id = $1;`;
@@ -323,6 +326,7 @@ const createStudent = async (req, res) => {
     marital_status,
     blood_group,
     nationality,
+    national_id,
     passport_no,
     
     -- Educational Background
@@ -331,21 +335,21 @@ const createStudent = async (req, res) => {
     school_graduation_year,
     school_graduation_point,
     school_graduation_field,
-    school_transcript,
-    school_certificate,
+    -- school_transcript,
+    -- school_certificate,
     
     collage_name,
     collage_exam_id,
     collage_graduation_year,
     collage_graduation_point,
-    collage_transcript,
-    collage_certificate,
+    -- collage_transcript,
+    -- collage_certificate,
     
     -- Family Information
     father_occupation,
     mother_occupation,
-    father_photo,
-    mother_photo,
+   -- father_photo,
+   -- mother_photo,
     
     -- Additional Information
     country,
@@ -374,8 +378,8 @@ const createStudent = async (req, res) => {
     $31, $32, $33, $34, $35,
     $36, $37, $38, $39, $40,
     $41, $42, $43, $44, $45,
-    $46, $47, $48, $49, $50,
-    $51, $52, $53, $54, $55, $56,
+    $46, $47, $48, $49, $50, 
+    $51,
     NOW(), NOW()
   )
   RETURNING *;
@@ -418,6 +422,7 @@ const insertValues = [
   marital_status,
   blood_group,
   nationality,
+  national_id,
   passport_no,
   
   // Educational Background
@@ -426,21 +431,21 @@ const insertValues = [
   school_graduation_year,
   school_graduation_point,
   school_graduation_field,
-  school_transcript,
-  school_certificate,
+  // school_transcript,
+  // school_certificate,
   
   collage_name,
   collage_exam_id,
   collage_graduation_year,
   collage_graduation_point,
-  collage_transcript,
-  collage_certificate,
+  // collage_transcript,
+  // collage_certificate,
   
   // Family Information
   father_occupation,
   mother_occupation,
-  father_photo,
-  mother_photo,
+  // father_photo,
+  // mother_photo,
   
   // Additional Information
   country,
@@ -466,6 +471,7 @@ const insertValues = [
     res.status(500).json({ error: "Failed to create student" });
   }
 };
+
 
 
 const updateStudent = async (req, res) => { 
