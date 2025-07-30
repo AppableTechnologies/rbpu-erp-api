@@ -15,6 +15,12 @@ router.post(
   upload.fields([
     { name: "photo", maxCount: 1 },
     { name: "signature", maxCount: 1 },
+    // { name: "school_transcript", maxCount: 1 },
+    // { name: "school_certificate", maxCount: 1 },
+    // { name: "collage_transcript", maxCount: 1 },
+    // { name: "collage_certificate", maxCount: 1 },
+    // { name: "father_photo", maxCount: 1 },
+    // { name: "mother_photo", maxCount: 1 },
   ]),
   createStudent 
 );
