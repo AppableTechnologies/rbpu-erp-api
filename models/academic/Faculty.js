@@ -2,7 +2,7 @@ const { DataTypes } = require("sequelize");
 const sequelize = require("../../pg_constant");
 
 const Faculty = sequelize.define(
-  "faculties",
+  "Faculty",
   {
     id: {
       type: DataTypes.INTEGER,
@@ -10,15 +10,15 @@ const Faculty = sequelize.define(
       autoIncrement: true,
     },
     title: {
-      type: DataTypes.STRING(191),
+      type: DataTypes.STRING(255),
       allowNull: false,
     },
     slug: {
-      type: DataTypes.STRING(191),
+      type: DataTypes.STRING(255),
       allowNull: false,
     },
     shortcode: {
-      type: DataTypes.STRING(191), // correct type
+      type: DataTypes.STRING(255), // correct type
     },
     status: {
       type: DataTypes.BOOLEAN,

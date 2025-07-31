@@ -1,4 +1,4 @@
-const Faculty = require("../../models/academic/faculties_model");
+const Faculty = require("../../models/academic/Faculty");
 const { pgPool } = require("../../pg_constant");
 
 module.exports = {

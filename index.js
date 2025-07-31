@@ -111,7 +111,7 @@ if (process.env.NODE_ENV !== "production") {
     .authenticate()
     .then(() => {
       console.log("✅ Database connected");
-      return sequelize.sync({ alter: true }); // optional in dev
+      return sequelize.sync(); // optional in dev
     })
     .then(() => {
       console.log("✅ Models synced");
