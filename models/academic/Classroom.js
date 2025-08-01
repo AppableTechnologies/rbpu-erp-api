@@ -50,7 +50,7 @@ const Classroom = sequelize.define(
   {
     tableName: "class_rooms",
     timestamps: false, // manually handled created_at and updated_at
-    underscored: true, // for snake_case DB columns
+   // underscored: true, // for snake_case DB columns
   }
 );
 
