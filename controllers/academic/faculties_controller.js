@@ -17,6 +17,7 @@ module.exports = {
           attributes: ["id", "title", "slug", "shortcode", "status"],
           order: [["id", "ASC"]]
         });
+        
 
         return res.status(200).json({ data: faculties });
 
@@ -44,7 +45,8 @@ module.exports = {
       //   return res.status(200).json({ data: dataResult.rows });
       // }
 
-      const { count: totalItems, rows: data } = await Faculty.findAndCountAll({
+      const { count: totalItems, rows: data } = 
+      await Faculty.findAndCountAll({
         attributes: ["id", "title", "slug", "shortcode", "status"],
         order: [["id", "ASC"]],
         limit,
