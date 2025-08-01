@@ -17,7 +17,12 @@ module.exports = {
                     sc.updated_at,
                     p.id AS program_id,
                     p.title AS program_title,
-                    JSON_AGG(DISTINCT s.title ORDER BY s.title) AS semesters
+                    JSON_AGG(
+                      JSON_BUILD_OBJECT(
+                        'semester_id', s.id,
+                        'semester_title', s.title
+                      ) ORDER BY s.title
+                    ) AS semesters
                 FROM sections sc
                 LEFT JOIN program_semester_sections pss ON sc.id = pss.section_id
                 LEFT JOIN programs p ON pss.program_id = p.id
@@ -59,7 +64,12 @@ module.exports = {
                     sc.updated_at,
                     p.id AS program_id,
                     p.title AS program_title,
-                    JSON_AGG(DISTINCT s.title ORDER BY s.title) AS semesters
+                    JSON_AGG(
+                      JSON_BUILD_OBJECT(
+                        'semester_id', s.id,
+                        'semester_title', s.title
+                      ) ORDER BY s.title
+                    ) AS semesters
                 FROM sections sc
                 LEFT JOIN program_semester_sections pss ON sc.id = pss.section_id
                 LEFT JOIN programs p ON pss.program_id = p.id
@@ -81,20 +91,21 @@ module.exports = {
     const {
       title,
       seat = null,
+      program_id,
       status = true,
-      programId,
-      semesterIds,
+      semesterIds = []
     } = req.body;
+    
     if (
       !title ||
-      (seat !== null && typeof seat !== "number") ||
-      !programId ||
+      (seat !== null && isNaN(seat)) ||
+      !program_id ||
       !Array.isArray(semesterIds) ||
       semesterIds.length === 0
     ) {
       return res
         .status(400)
-        .json({ error: "All fields are required or empty semester list." });
+        .json({ error: "Missing required fields or semesterIds must be a non-empty array." });
     }
 
     try {
@@ -108,29 +119,44 @@ module.exports = {
           error: "A section with the same title already exists.",
         });
       }
-      const insertSections = await pgPool.query(
-        `INSERT INTO sections (title, seat, status, created_at, updated_at)
-            VALUES ($1, $2, $3, NOW(), NOW()) RETURNING *`,
-        [title, seat, status]
-      );
 
-      const section = insertSections.rows[0];
-      const section_id = section.id;
+      // Start a transaction
+      const client = await pgPool.connect();
+      try {
+        await client.query('BEGIN');
 
-      const programSemesterSectionInsertPromises = semesterIds.map(
-        (semesterId) => {
-          return pgPool.query(
-            `INSERT INTO program_semester_sections (program_id, semester_id, section_id ,created_at, updated_at)
-            VALUES ($1, $2, $3 , NOW(), NOW()) RETURNING *`,
-            [programId, semesterId, section_id]
-          );
-        }
-      );
-      await Promise.all(programSemesterSectionInsertPromises);
-      return res.status(201).json({
-        message: "Section created successfully.",
-        section,
-      });
+        const insertSections = await client.query(
+          `INSERT INTO sections (title, seat, status, created_at, updated_at)
+           VALUES ($1, $2, $3, NOW(), NOW()) RETURNING *`,
+          [title, seat, status]
+        );
+
+        const section = insertSections.rows[0];
+        const section_id = section.id;
+
+        const programSemesterSectionInsertPromises = semesterIds.map(
+          (semesterId) => {
+            return client.query(
+              `INSERT INTO program_semester_sections (program_id, semester_id, section_id, created_at, updated_at)
+               VALUES ($1, $2, $3, NOW(), NOW()) RETURNING *`,
+              [program_id, semesterId, section_id]
+            );
+          }
+        );
+        
+        await Promise.all(programSemesterSectionInsertPromises);
+        await client.query('COMMIT');
+        
+        return res.status(201).json({
+          message: "Section created successfully.",
+          section,
+        });
+      } catch (error) {
+        await client.query('ROLLBACK');
+        throw error;
+      } finally {
+        client.release();
+      }
     } catch (error) {
       console.error("Error creating section:", error);
       return res.status(500).json({ error: "Internal server error" });
@@ -142,62 +168,84 @@ module.exports = {
     const {
       title,
       seat = null,
+      program_id,
       status = true,
-      programId,
-      semesterIds,
+      semesterIds = []
     } = req.body;
+    
     if (
       !title ||
-      (seat !== null && typeof seat !== "number") ||
-      !programId ||
+      (seat !== null && isNaN(seat)) ||
+      !program_id ||
       !Array.isArray(semesterIds) ||
       semesterIds.length === 0
     ) {
       return res
         .status(400)
-        .json({ error: "Missing required fields or empty program list." });
-    }
-
-    const duplicateCheck = await pgPool.query(
-      "SELECT id FROM sections WHERE title = $1 AND  id != $2",
-      [title, sectionId]
-    );
-
-    if (duplicateCheck.rowCount > 0) {
-      return res.status(409).json({
-        error: "Another section with the same title already exists.",
-      });
+        .json({ error: "Missing required fields or semesterIds must be a non-empty array." });
     }
 
     try {
+      const duplicateCheck = await pgPool.query(
+        "SELECT id FROM sections WHERE title = $1 AND id != $2",
+        [title, sectionId]
+      );
+
+      if (duplicateCheck.rowCount > 0) {
+        return res.status(409).json({
+          error: "Another section with the same title already exists.",
+        });
+      }
+
       const sectionCheck = await pgPool.query(
         "SELECT * FROM sections WHERE id = $1",
         [sectionId]
       );
+      
       if (sectionCheck.rowCount === 0) {
         return res.status(404).json({ error: "Section not found." });
       }
-      await pgPool.query(
-        `UPDATE sections
-         SET title = $1, seat = $2, status = $3, updated_at = NOW()
-         WHERE id = $4`,
-        [title, seat, status, sectionId]
-      );
-      await pgPool.query(
-        "DELETE FROM program_semester_sections WHERE section_id = $1",
-        [sectionId]
-      );
-      const programSemesterSectionInsertPromises = semesterIds.map(
-        (semesterId) => {
-          return pgPool.query(
-            `INSERT INTO program_semester_sections (program_id, semester_id, section_id ,created_at, updated_at)
-                VALUES ($1, $2, $3 , NOW(), NOW()) RETURNING *`,
-            [programId, semesterId, sectionId]
-          );
-        }
-      );
-      await Promise.all(programSemesterSectionInsertPromises);
-      return res.status(200).json({ message: "Section updated successfully." });
+
+      // Start a transaction
+      const client = await pgPool.connect();
+      try {
+        await client.query('BEGIN');
+
+        // Update the section
+        await client.query(
+          `UPDATE sections
+           SET title = $1, seat = $2, status = $3, updated_at = NOW()
+           WHERE id = $4`,
+          [title, seat, status, sectionId]
+        );
+
+        // Delete existing associations
+        await client.query(
+          "DELETE FROM program_semester_sections WHERE section_id = $1",
+          [sectionId]
+        );
+
+        // Insert new associations
+        const programSemesterSectionInsertPromises = semesterIds.map(
+          (semesterId) => {
+            return client.query(
+              `INSERT INTO program_semester_sections (program_id, semester_id, section_id, created_at, updated_at)
+               VALUES ($1, $2, $3, NOW(), NOW()) RETURNING *`,
+              [program_id, semesterId, sectionId]
+            );
+          }
+        );
+        
+        await Promise.all(programSemesterSectionInsertPromises);
+        await client.query('COMMIT');
+        
+        return res.status(200).json({ message: "Section updated successfully." });
+      } catch (error) {
+        await client.query('ROLLBACK');
+        throw error;
+      } finally {
+        client.release();
+      }
     } catch (error) {
       console.error("Error updating section:", error);
       return res.status(500).json({ error: "Internal server error" });
@@ -214,12 +262,28 @@ module.exports = {
       if (checkSection.rowCount === 0) {
         return res.status(404).json({ error: "Section not found." });
       }
-      await pgPool.query(
-        "DELETE FROM program_semester_sections WHERE section_id = $1",
-        [sectionId]
-      );
-      await pgPool.query("DELETE FROM sections WHERE id = $1", [sectionId]);
-      return res.status(200).json({ message: "Section deleted successfully." });
+
+      // Start a transaction
+      const client = await pgPool.connect();
+      try {
+        await client.query('BEGIN');
+        
+        await client.query(
+          "DELETE FROM program_semester_sections WHERE section_id = $1",
+          [sectionId]
+        );
+        
+        await client.query("DELETE FROM sections WHERE id = $1", [sectionId]);
+        
+        await client.query('COMMIT');
+        
+        return res.status(200).json({ message: "Section deleted successfully." });
+      } catch (error) {
+        await client.query('ROLLBACK');
+        throw error;
+      } finally {
+        client.release();
+      }
     } catch (error) {
       console.error("Error deleting section:", error);
       return res.status(500).json({ error: "Internal server error" });
