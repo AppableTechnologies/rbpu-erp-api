@@ -1,3 +1,4 @@
+const { Op } = require("sequelize");
 const { Session, Program, ProgramSession } = require("../../models");
 const sequelize = require("../../pg_constant");
 const { pgPool } = require("../../pg_constant");
@@ -353,6 +354,13 @@ const updateSession = async (req, res) => {
       updated_at: new Date(),
     });
 
+    // Update many-to-many relation: setPrograms replaces existing relations
+    const programs = await Program.findAll({
+      where: {
+        id: program_ids,
+      },
+    });
+
     // Delete existing program links
     // await pgPool.query("DELETE FROM program_session WHERE session_id = $1", [
     //   sessionId,
@@ -389,17 +397,33 @@ const updateSession = async (req, res) => {
 const deleteSession = async (req, res) => {
   const sessionId = req.params.sessionId;
   try {
-    const sessionCheck = await pgPool.query(
-      "SELECT * FROM sessions WHERE id = $1",
-      [sessionId]
-    );
-    if (sessionCheck.rowCount === 0) {
+    // const sessionCheck = await pgPool.query(
+    //   "SELECT * FROM sessions WHERE id = $1",
+    //   [sessionId]
+    // );
+    // if (sessionCheck.rowCount === 0) {
+    //   return res.status(404).json({ error: "Session not found." });
+    // }
+
+    // Check if the session exists
+    const session = await Session.findByPk(sessionId);
+
+    if (!session) {
       return res.status(404).json({ error: "Session not found." });
     }
-    await pgPool.query("DELETE FROM program_session WHERE session_id = $1", [
-      sessionId,
-    ]);
-    await pgPool.query("DELETE FROM sessions WHERE id = $1", [sessionId]);
+
+    // await pgPool.query("DELETE FROM program_session WHERE session_id = $1", [
+    //   sessionId,
+    // ]);
+
+    // Delete the associated records from the join table (many-to-many relation)
+    await session.setPrograms([]); // Removes all associations from the join table
+
+    // await pgPool.query("DELETE FROM sessions WHERE id = $1", [sessionId]);
+
+    // Delete the session itself
+    await session.destroy();
+
     return res.status(200).json({
       message: "Session and associated programs deleted successfully.",
     });
