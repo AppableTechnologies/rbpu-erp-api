@@ -1,14 +1,53 @@
 const { pgPool } = require("../../pg_constant");
 
+// const getStudents = async (req, res) => {
+//   try {
+//     const result = await pgPool.query("SELECT * FROM students ORDER BY student_id DESC");
+//     res.status(200).json(result.rows);
+//   } catch (error) {
+//     console.error("Error fetching students:", error);
+//     res.status(500).json({ message: "Error fetching students" });
+//   }
+// };
 const getStudents = async (req, res) => {
   try {
-    const result = await pgPool.query("SELECT * FROM students ORDER BY student_id DESC");
-    res.status(200).json(result.rows);
+    const query = `
+      SELECT 
+        s.student_id,
+        s.first_name,
+        s.status,
+        p.title AS program,
+
+        json_agg(
+          json_build_object(
+            'semester', sem.title,
+            'section', sec.title,
+            'session', sess.title
+          )
+        ) AS academic_details
+
+      FROM students s
+      LEFT JOIN programs p ON s.program_id = p.id
+      LEFT JOIN program_semester_sections pss ON s.program_id = pss.program_id
+      LEFT JOIN semesters sem ON pss.semester_id = sem.id
+      LEFT JOIN sections sec ON pss.section_id = sec.id
+      LEFT JOIN program_session ps ON s.program_id = ps.program_id
+      LEFT JOIN sessions sess ON ps.session_id = sess.id
+
+      GROUP BY s.student_id, s.first_name, s.status, p.title
+      ORDER BY s.student_id DESC
+    `;
+
+    const result = await pgPool.query(query);
+    res.status(200).json({ students: result.rows });
   } catch (error) {
     console.error("Error fetching students:", error);
     res.status(500).json({ message: "Error fetching students" });
   }
 };
+
+
+
 
 const getStudentById = async (req, res) => {
   const { id } = req.params;

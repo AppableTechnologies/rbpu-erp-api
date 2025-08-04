@@ -10,6 +10,7 @@ const {
 } = require("../../controllers/admission/student_registration_controller");
 
 router.get("/", getStudents);
+
 router.post(
   "/create",
   upload.fields([

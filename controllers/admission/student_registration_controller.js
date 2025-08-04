@@ -53,7 +53,22 @@ const getStudents = async (req, res) => {
   }
 };
 
+const getStudentById = async (req, res) => {
+  const { id } = req.params;
 
+  try {
+    const result = await pgPool.query("SELECT * FROM students WHERE student_id = $1", [id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "Student not found" });
+    }
+
+    res.status(200).json(result.rows[0]);
+  } catch (error) {
+    console.error("Error fetching student by ID:", error);
+    res.status(500).json({ message: "Error fetching student" });
+  }
+};
 // const createStudent = async (req, res) => {
 //   try {
 //     logger.log("info", "inside createStudent Controller");
@@ -547,6 +562,7 @@ const deleteStudent = async (req, res) => {
 module.exports = {
   getStudents,
   createStudent,
+  getStudentById,
   updateStudent,
   deleteStudent,
 };
