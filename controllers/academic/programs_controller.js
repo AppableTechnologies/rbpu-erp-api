@@ -37,8 +37,8 @@ module.exports = {
       const formattedPrograms = programs.map((program) => ({
         program_id: program.id,
         title: program.title,
-        faculty_id: program.Faculty?.id || null,
-        faculty_title: program.Faculty?.title || null,
+        faculty_id: program.faculty?.id || null,
+        faculty_title: program.faculty?.title || null,
         slug: program.slug,
         shortcode: program.shortcode,
         registration: program.registration,
@@ -282,7 +282,7 @@ module.exports = {
       // }
 
       const faculty = await Faculty.findByPk(faculty_id);
-      if (!faculty) { 
+      if (!faculty) {
         return res.status(400).json({ message: "Faculty does not exist" });
       }
 
@@ -320,16 +320,28 @@ module.exports = {
   deleteProgram: async (req, res) => {
     const { id } = req.params;
     try {
-      const result = await pgPool.query(
-        `DELETE FROM programs
-      WHERE id = $1
-      RETURNING *;`,
-        [id]
-      );
-      if (result.rowCount === 0) {
-        return res.status(404).json({ message: "Program not found" });
+      const program = await Program.findByPk(id);
+
+      if (!program) {
+        return res
+          .status(404)
+          .json({ message: `Program not found to delete with this ${id}` });
       }
-      res.status(200).json({ message: "Program deleted successfully" });
+
+     await Program.destroy({ where: { id } });
+
+      // const result = await pgPool.query(
+      //   `DELETE FROM programs
+      // WHERE id = $1
+      // RETURNING *;`,
+      //   [id]
+      // );
+      // if (result.rowCount === 0) {
+      //   return res.status(404).json({ message: "Program not found" });
+      // }
+      res
+        .status(200)
+        .json({ message: `Program deleted successfully with id ${id}` });
     } catch (error) {
       console.error("Error deleting program:", error);
       res.status(500).json({ message: "Server error while deleting program" });

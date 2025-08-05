@@ -12,6 +12,10 @@ const Program = sequelize.define(
     faculty_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      references: {
+        model: "faculties", // Matches your Faculty table name
+        key: "id",
+      },
     },
     title: {
       type: DataTypes.STRING(191),
