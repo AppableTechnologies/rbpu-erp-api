@@ -135,7 +135,7 @@ module.exports = {
           limit,
         },
       });
-    } catch (error) {
+    } catch (error) { 
       console.error("Error fetching programs:", error);
       return res
         .status(500)
