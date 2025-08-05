@@ -7,6 +7,8 @@ const BatchProgram = require("./academic/batch/BatchProgram.js");
 const Session = require("./academic/Session.js");
 const Menu = require("./common/Menus.js");
 const Submenu = require("./common/SubMenus.js");
+const Semester = require("./academic/semester/Semester.js");
+const ProgramSemester = require("./academic/semester/programSemester.js");
 
 // Association
 Menu.hasMany(Submenu, {
@@ -44,6 +46,24 @@ Program.belongsToMany(Batch, {
   otherKey: "batch_id"
 });
 
+Semester.belongsToMany(Program, {
+  through: ProgramSemester,
+  foreignKey: "semester_id",
+  otherKey: "program_id"
+});
+
+Program.belongsToMany(Semester, {
+  through: ProgramSemester,
+  foreignKey: "program_id",
+  otherKey: "semester_id"
+});
+
+
+Semester.hasMany(ProgramSemester, { foreignKey: "semester_id" });
+ProgramSemester.belongsTo(Semester, { foreignKey: "semester_id" });
+Program.hasMany(ProgramSemester, { foreignKey: "program_id" });
+ProgramSemester.belongsTo(Program, { foreignKey: "program_id" });
+
 // Optional: If you need direct access to the join table
 Batch.hasMany(BatchProgram, { foreignKey: "batch_id" });
 Program.hasMany(BatchProgram, { foreignKey: "program_id" });
@@ -71,4 +91,6 @@ module.exports = {
   Session,
   Batch,
   BatchProgram, 
+  Semester,
+  ProgramSemester
 };

@@ -1,4 +1,6 @@
+const { Program, Semester, ProgramSemester } = require("../../models");
 const { pgPool } = require("../../pg_constant");
+const { Op } = require("sequelize");
 
 module.exports = {
   getSemester: async (req, res) => {
@@ -6,46 +8,58 @@ module.exports = {
     const page = parseInt(req.query.page) || 1;
     const limit = all ? null : parseInt(req.query.limit) || 10;
     const offset = (page - 1) * (limit || 0);
+
     try {
       if (all) {
-        const dataQuery = `
-                SELECT 
-                    st.id AS semester_id,
-                    st.title AS semester_title, 
-                    st.year,
-                    st.status,
-                    st.created_at,
-                    st.updated_at,
-                    json_agg(
-                        json_build_object(
-                            'program_id', p.id,
-                            'program_title', p.title
-                        )
-                    ) AS programs
-                FROM semesters st
-                LEFT JOIN program_semester ps ON st.id = ps.semester_id
-                LEFT JOIN programs p ON ps.program_id = p.id
-                GROUP BY st.id
-                ORDER BY st.id ASC;`;
+        const semesters = await Semester.findAll({
+          attributes: [
+            "id",
+            ["title", "semester_title"],
+            "year",
+            "status",
+            "created_at",
+            "updated_at",
+          ],
+          include: [
+            {
+              model: Program,
+              through: { attributes: [] },
+              attributes: [
+                ["id", "program_id"],
+                ["title", "program_title"],
+              ],
+              required: false,
+            },
+          ],
+          order: [["id", "ASC"]],
+        });
 
-        const dataResult = await pgPool.query(dataQuery);
-        return res.status(200).json({ data: dataResult.rows });
+        // Format response
+        const formattedSemesters = semesters.map((semester) => {
+          const semesterJson = semester.toJSON();
+          return {
+            semester_id: semesterJson.id,
+            semester_title: semesterJson.semester_title,
+            year: semesterJson.year,
+            status: semesterJson.status,
+            created_at: semesterJson.created_at,
+            updated_at: semesterJson.updated_at,
+            programs: semesterJson.Programs || [],
+          };
+        });
+
+        return res.status(200).json(formattedSemesters);
       } else {
-        // For paginated semsters
-        // First get the semesters IDs for the current page
-        const semesterIdsQuery = `
-                SELECT id FROM semesters
-                ORDER BY id ASC
-                LIMIT $1 OFFSET $2;
-            `;
-
-        const semesterIdsResult = await pgPool.query(semesterIdsQuery, [
+        // Paginated version
+        const { count, rows: semesters } = await Semester.findAndCountAll({
+          attributes: ["id"],
+          order: [["id", "ASC"]],
           limit,
           offset,
-        ]);
-        const semesterIds = semesterIdsResult.rows.map((row) => row.id);
+          distinct: true,
+        });
 
-        if (semesterIds.length === 0) {
+        if (semesters.length === 0) {
           return res.status(200).json({
             data: [],
             pagination: {
@@ -57,37 +71,50 @@ module.exports = {
           });
         }
 
-        // Then get the full semseter data with programs for these IDs
-        const dataQuery = `
-                 SELECT 
-                    st.id AS semester_id,
-                    st.title AS semester_title, 
-                    st.year,
-                    st.status,
-                    st.created_at,
-                    st.updated_at,
-                    json_agg(
-                        json_build_object(
-                            'program_id', p.id,
-                            'program_title', p.title
-                        )
-                    ) AS programs
-                FROM semesters st
-                LEFT JOIN program_semester ps ON st.id = ps.semester_id
-                LEFT JOIN programs p ON ps.program_id = p.id
-                WHERE st.id = ANY($1)
-                GROUP BY st.id
-                ORDER BY st.id ASC;`;
+        const semesterIds = semesters.map((semester) => semester.id);
 
-        const dataResult = await pgPool.query(dataQuery, [semesterIds]);
+        const semesterDetails = await Semester.findAll({
+          attributes: [
+            "id",
+            ["title", "semester_title"],
+            "year",
+            "status",
+            "created_at",
+            "updated_at",
+          ],
+          include: [
+            {
+              model: Program,
+              through: { attributes: [] },
+              attributes: [
+                ["id", "program_id"],
+                ["title", "program_title"],
+              ],
+              required: false,
+            },
+          ],
+          where: { id: semesterIds },
+          order: [["id", "ASC"]],
+        });
 
-        const countQuery = `SELECT COUNT(*) FROM semesters;`;
-        const countResult = await pgPool.query(countQuery);
-        const totalItems = parseInt(countResult.rows[0].count);
-        const totalPages = Math.ceil(totalItems / limit);
+        const formattedSemesters = semesterDetails.map((semester) => {
+          const semesterJson = semester.toJSON();
+          return {
+            semester_id: semesterJson.id,
+            semester_title: semesterJson.semester_title,
+            year: semesterJson.year,
+            status: semesterJson.status,
+            created_at: semesterJson.created_at,
+            updated_at: semesterJson.updated_at,
+            programs: semesterJson.Programs || [],
+          };
+        });
+
+        const totalItems = count;
+        const totalPages = limit ? Math.ceil(totalItems / limit) : 1;
 
         return res.status(200).json({
-          data: dataResult.rows,
+          data: formattedSemesters,
           pagination: {
             totalItems,
             totalPages,
@@ -115,39 +142,52 @@ module.exports = {
 
     try {
       // Duplicate  check
-      const duplicateCheck = await pgPool.query(
-        "SELECT id FROM semesters WHERE title = $1",
-        [title]
-      );
+      const duplicateCheck = await Semester.findOne({
+        where: {
+          title: title,
+        },
+      });
 
-      if (duplicateCheck.rowCount > 0) {
+      if (duplicateCheck) {
         return res.status(409).json({
           error: "A semester with the same title already exists.",
         });
       }
 
-      const insertSemesters = await pgPool.query(
-        `INSERT INTO semesters (title, year, status, created_at, updated_at) 
-       VALUES ($1, $2, $3, NOW(), NOW()) RETURNING *`,
-        [title, year, status]
-      );
+      // const insertSemesters = await pgPool.query(
+      //   `INSERT INTO semesters (title, year, status, created_at, updated_at)
+      //  VALUES ($1, $2, $3, NOW(), NOW()) RETURNING *`,
+      //   [title, year, status]
+      // );
+      const insertSemesters = await Semester.create({
+        title: title,
+        year: year,
+        status: status,
+      });
 
-      const semester = insertSemesters.rows[0];
+      const semester = insertSemesters;
       const semester_id = semester.id;
 
       // Insert all program links
+      // const programInsertPromises = program_ids.map((pid) =>
+      //   pgPool.query(
+      //     `INSERT INTO program_semester (semester_id, program_id) VALUES ($1, $2) ON CONFLICT DO NOTHING
+      //    RETURNING *`,
+      //     [semester_id, pid]
+      //   )
+      // );
+
       const programInsertPromises = program_ids.map((pid) =>
-        pgPool.query(
-          `INSERT INTO program_semester (semester_id, program_id) VALUES ($1, $2) ON CONFLICT DO NOTHING
-         RETURNING *`,
-          [semester_id, pid]
-        )
+        ProgramSemester.create({
+          semester_id: semester_id,
+          program_id: pid,
+        })
       );
 
       await Promise.all(programInsertPromises);
 
       return res.status(201).json({
-        message: "Semester created successfully with assigned programs",
+        message: "Semester created successfully.",
         semester,
       });
     } catch (error) {
@@ -167,45 +207,57 @@ module.exports = {
         .json({ error: "Missing required fields or empty program list." });
     }
 
-    const duplicateCheck = await pgPool.query(
-            "SELECT id FROM semesters WHERE title = $1 AND  id != $2",
-            [title, semesterId]
-        );
-
-        if (duplicateCheck.rowCount > 0) {
-            return res.status(409).json({
-                error: "Another semester with the same title already exists.",
-            });
-        }
-
     try {
-      const semesterCheck = await pgPool.query(
-        "SELECT * FROM semesters WHERE id = $1",
-        [semesterId]
-      );
-      if (semesterCheck.rowCount === 0) {
+    
+      const SemesterCheck = await Semester.findByPk(semesterId);
+
+      if (!SemesterCheck) {
         return res.status(404).json({ error: "Semester not found." });
       }
 
-      await pgPool.query(
-        `UPDATE semesters 
-       SET title = $1, year = $2, status = $3, updated_at = NOW() 
-       WHERE id = $4`,
-        [title, year, status, semesterId]
-      );
+      // await pgPool.query(
+      //   `UPDATE semesters
+      //  SET title = $1, year = $2, status = $3, updated_at = NOW()
+      //  WHERE id = $4`,
+      //   [title, year, status, semesterId]
+      // );
 
+      await Semester.update(
+        {
+          title: title,
+          year: year,
+          status: status,
+        },
+        {
+          where: {
+            id: semesterId,
+          },
+        }
+      );
       // Delete existing program links
-      await pgPool.query(
-        "DELETE FROM program_semester WHERE semester_id = $1",
-        [semesterId]
-      );
+      // await pgPool.query(
+      //   "DELETE FROM program_semester WHERE semester_id = $1",
+      //   [semesterId]
+      // );
 
+      await ProgramSemester.destroy({
+        where: {
+          semester_id: semesterId,
+        },
+      })
       // Insert new program links
+      // const insertPromises = program_ids.map((pid) =>
+      //   pgPool.query(
+      //     `INSERT INTO program_semester (semester_id, program_id) VALUES ($1, $2) ON CONFLICT DO NOTHING`,
+      //     [semesterId, pid]
+      //   )
+      // );
       const insertPromises = program_ids.map((pid) =>
-        pgPool.query(
-          `INSERT INTO program_semester (semester_id, program_id) VALUES ($1, $2) ON CONFLICT DO NOTHING`,
-          [semesterId, pid]
-        )
+        ProgramSemester.create({
+        
+          semester_id: semesterId,
+          program_id: pid,
+        })
       );
       await Promise.all(insertPromises);
 
@@ -220,26 +272,31 @@ module.exports = {
     }
   },
 
-
   deleteSemester: async (req, res) => {
     const semesterId = req.params.id;
 
     try {
-      const semesterCheck = await pgPool.query(
-        "SELECT * FROM semesters WHERE id = $1",
-        [semesterId]
-      );
-      if (semesterCheck.rowCount === 0) {
+      const semesterCheck = await Semester.findByPk(semesterId);
+
+      if (!semesterCheck) {
         return res.status(404).json({ error: "Semester not found." });
       }
 
-      await pgPool.query("DELETE FROM program_semester WHERE semester_id = $1", [
-        semesterId,
-      ]);
-     
-
-      await pgPool.query("DELETE FROM semesters WHERE id = $1", [semesterId]);
-
+      // await pgPool.query(
+      //   "DELETE FROM program_semester WHERE semester_id = $1",
+      //   [semesterId]
+      // );
+      await ProgramSemester.destroy({
+        where:{
+          semester_id:semesterId
+        }
+      })
+      // await pgPool.query("DELETE FROM semesters WHERE id = $1", [semesterId]);
+      await Semester.destroy({
+        where: {
+          id: semesterId,
+        },
+      })
       return res.status(200).json({
         message: "Semester and associated programs deleted successfully.",
       });
