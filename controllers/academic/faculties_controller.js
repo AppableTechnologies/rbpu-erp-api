@@ -153,19 +153,6 @@ module.exports = {
 
     try {
      
-
-      const duplicateCheck = await Faculty.findOne({
-      where: {
-        title: title,
-        id: { [Op.ne]: id },
-      },
-    })
-
-    if (duplicateCheck) {
-      return res.status(409).json({
-        error: "Another faculty with the same title already exists.",
-      });
-    }
     
       // const query = `
       //   UPDATE faculties
