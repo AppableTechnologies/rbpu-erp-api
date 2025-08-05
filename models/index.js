@@ -25,25 +25,23 @@ Session.belongsToMany(Program, {
   otherKey: "program_id",
 });
 
-
 Program.belongsToMany(Session, {
   through: ProgramSession,
   foreignKey: "program_id",
   otherKey: "session_id",
 });
 
-
 // Batch-Program many-to-many relationship
 Batch.belongsToMany(Program, {
   through: BatchProgram,
   foreignKey: "batch_id",
-  otherKey: "program_id"
+  otherKey: "program_id",
 });
 
 Program.belongsToMany(Batch, {
   through: BatchProgram,
   foreignKey: "program_id",
-  otherKey: "batch_id"
+  otherKey: "batch_id",
 });
 
 Semester.belongsToMany(Program, {
@@ -70,7 +68,6 @@ Program.hasMany(BatchProgram, { foreignKey: "program_id" });
 BatchProgram.belongsTo(Batch, { foreignKey: "batch_id" });
 BatchProgram.belongsTo(Program, { foreignKey: "program_id" });
 
-
 // Optional reverse relations (useful for includes)
 Session.hasMany(ProgramSession, { foreignKey: "session_id" });
 Program.hasMany(ProgramSession, { foreignKey: "program_id" });
@@ -79,7 +76,7 @@ ProgramSession.belongsTo(Session, { foreignKey: "session_id" });
 ProgramSession.belongsTo(Program, { foreignKey: "program_id" });
 
 Program.belongsTo(Faculty, { foreignKey: "faculty_id", as: "faculty" });
-// Faculty.hasMany(Program, { foreignKey: "faculty_id", as: "programs" });
+Faculty.hasMany(Program, { foreignKey: "faculty_id", as: "programs" });
 
 module.exports = {
   Menu,
@@ -93,4 +90,5 @@ module.exports = {
   BatchProgram, 
   Semester,
   ProgramSemester
+
 };

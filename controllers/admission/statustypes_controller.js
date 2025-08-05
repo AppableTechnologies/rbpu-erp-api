@@ -1,46 +1,187 @@
-const { pgPool } = require("../../pg_constant");
+// const { pgPool } = require("../../pg_constant");
 
+// module.exports = {
+
+//   // getStatusTypes: async (req, res) => {
+//   //   try {
+//   //     const query = `SELECT id, title, slug, description, status FROM status_types ORDER BY id ASC;`;
+//   //     const result = await pgPool.query(query);
+//   //     return res.status(200).json(result.rows);
+//   //   } catch (error) {
+//   //     console.error('Error fetching status types:', error);
+//   //     return res.status(500).json({ message: 'Server error while fetching status types' });
+//   //   }
+//   // },
+
+//   getStatusTypes: async (req, res) => {
+//   const page = parseInt(req.query.page) || 1;
+//   const limit = parseInt(req.query.limit) || 10;
+//   const offset = (page - 1) * limit;
+
+//   try {
+//     if (page < 1 || limit < 1) {
+//       return res.status(400).json({ error: "Invalid page or limit" });
+//     }
+
+//     // Get paginated data
+//     const dataQuery = `
+//       SELECT id, title, slug, description, status
+//       FROM status_types
+//       ORDER BY id ASC
+//       LIMIT $1 OFFSET $2;
+//     `;
+//     const dataResult = await pgPool.query(dataQuery, [limit, offset]);
+
+//     // Get total count
+//     const countQuery = `SELECT COUNT(*) FROM status_types;`;
+//     const countResult = await pgPool.query(countQuery);
+//     const totalItems = parseInt(countResult.rows[0].count);
+//     const totalPages = Math.ceil(totalItems / limit);
+
+//     if (page > totalPages && totalItems > 0) {
+//       return res.status(404).json({
+//         error: `Current Page ${page} exceeds total records ${totalItems} with limit ${limit}`,
+//         pagination: {
+//           totalItems,
+//           totalPages,
+//           currentPage: page,
+//           limit,
+//         },
+//       });
+//     }
+
+//     return res.status(200).json({
+//       data: dataResult.rows,
+//       pagination: {
+//         totalItems,
+//         totalPages,
+//         currentPage: page,
+//         limit,
+//       },
+//     });
+
+//   } catch (error) {
+//     console.error("Error fetching status types:", error);
+//     return res.status(500).json({ message: "Server error while fetching status types" });
+//   }
+// }
+// ,
+
+//   createStatusType: async (req, res) => {
+//     const { title, description } = req.body;
+//     const slug = title.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
+
+//     try {
+//       const checkQuery = `
+//         SELECT * FROM status_types 
+//         WHERE LOWER(title) = LOWER($1) OR slug = $2;
+//       `;
+//       const checkValues = [title, slug];
+//       const checkResult = await pgPool.query(checkQuery, checkValues);
+
+//       if (checkResult.rows.length > 0) {
+//         return res.status(400).json({ message: 'Status type with this title or slug already exists' });
+//       }
+
+//       const insertQuery = `
+//         INSERT INTO status_types (title, slug, description, status, created_at, updated_at)
+//         VALUES ($1, $2, $3, $4, NOW(), NOW())
+//         RETURNING *;
+//       `;
+//       const insertValues = [title, slug, description || null, true ];
+//       const result = await pgPool.query(insertQuery, insertValues);
+
+//       res.status(201).json(result.rows[0]);
+//     } catch (err) {
+//       console.error('Error creating status type:', err);
+//       res.status(500).json({ message: 'Server error while creating status type' });
+//     }
+//   },
+
+//   updateStatusType: async (req, res) => {
+//     const { id } = req.params;
+//     const { title, description, status } = req.body;
+//     const slug = title.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
+
+//     try {
+//       const query = `
+//         UPDATE status_types
+//         SET title = $1, slug = $2, description = $3, status = $4, updated_at = NOW()
+//         WHERE id = $5
+//         RETURNING *;
+//       `;
+//       const values = [title, slug, description || null, status, id];
+//       const result = await pgPool.query(query, values);
+
+//       if (result.rowCount === 0) {
+//         return res.status(404).json({ message: 'Status type not found' });
+//       }
+
+//       res.status(200).json(result.rows[0]);
+//     } catch (err) {
+//       console.error('Error updating status type:', err);
+//       res.status(500).json({ message: 'Server error while updating status type' });
+//     }
+//   },
+
+//   deleteStatusType: async (req, res) => {
+//     const { id } = req.params;
+
+//     try {
+//       const query = `
+//         DELETE FROM status_types
+//         WHERE id = $1
+//         RETURNING *;
+//       `;
+//       const result = await pgPool.query(query, [id]);
+
+//       if (result.rowCount === 0) {
+//         return res.status(404).json({ message: 'Status type not found' });
+//       }
+
+//       res.status(200).json({ message: 'Status type deleted successfully' });
+//     } catch (err) {
+//       console.error('Error deleting status type:', err);
+//       res.status(500).json({ message: 'Server error while deleting status type' });
+//     }
+//   }
+
+// };
+
+
+const { Op, Sequelize } = require("sequelize");
+const StatusTypes = require("../../models/admission/StatusTypes");
 module.exports = {
-
-  // getStatusTypes: async (req, res) => {
-  //   try {
-  //     const query = `SELECT id, title, slug, description, status FROM status_types ORDER BY id ASC;`;
-  //     const result = await pgPool.query(query);
-  //     return res.status(200).json(result.rows);
-  //   } catch (error) {
-  //     console.error('Error fetching status types:', error);
-  //     return res.status(500).json({ message: 'Server error while fetching status types' });
-  //   }
-  // },
-
+  // GET (Paginated)
   getStatusTypes: async (req, res) => {
-  const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 10;
-  const offset = (page - 1) * limit;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
 
-  try {
-    if (page < 1 || limit < 1) {
-      return res.status(400).json({ error: "Invalid page or limit" });
-    }
+    try {
+      const { count: totalItems, rows: data } = await StatusTypes.findAndCountAll({
+        limit,
+        offset,
+        order: [['id', 'ASC']],
+        attributes: ['id', 'title', 'slug', 'description', 'status']
+      });
 
-    // Get paginated data
-    const dataQuery = `
-      SELECT id, title, slug, description, status
-      FROM status_types
-      ORDER BY id ASC
-      LIMIT $1 OFFSET $2;
-    `;
-    const dataResult = await pgPool.query(dataQuery, [limit, offset]);
+      const totalPages = Math.ceil(totalItems / limit);
 
-    // Get total count
-    const countQuery = `SELECT COUNT(*) FROM status_types;`;
-    const countResult = await pgPool.query(countQuery);
-    const totalItems = parseInt(countResult.rows[0].count);
-    const totalPages = Math.ceil(totalItems / limit);
+      if (page > totalPages && totalItems > 0) {
+        return res.status(404).json({
+          error: `Current Page ${page} exceeds total records ${totalItems} with limit ${limit}`,
+          pagination: {
+            totalItems,
+            totalPages,
+            currentPage: page,
+            limit,
+          },
+        });
+      }
 
-    if (page > totalPages && totalItems > 0) {
-      return res.status(404).json({
-        error: `Current Page ${page} exceeds total records ${totalItems} with limit ${limit}`,
+      res.status(200).json({
+        data,
         pagination: {
           totalItems,
           totalPages,
@@ -48,94 +189,89 @@ module.exports = {
           limit,
         },
       });
+    } catch (error) {
+      console.error("Error fetching status types:", error);
+      return res.status(500).json({ message: "Server error while fetching status types" });
     }
+  },
 
-    return res.status(200).json({
-      data: dataResult.rows,
-      pagination: {
-        totalItems,
-        totalPages,
-        currentPage: page,
-        limit,
-      },
-    });
-
-  } catch (error) {
-    console.error("Error fetching status types:", error);
-    return res.status(500).json({ message: "Server error while fetching status types" });
-  }
-}
-,
-
+  // POST (Create)
   createStatusType: async (req, res) => {
     const { title, description } = req.body;
     const slug = title.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
 
     try {
-      const checkQuery = `
-        SELECT * FROM status_types 
-        WHERE LOWER(title) = LOWER($1) OR slug = $2;
-      `;
-      const checkValues = [title, slug];
-      const checkResult = await pgPool.query(checkQuery, checkValues);
+      const existing = await StatusTypes.findOne({
+        where: {
+          [Sequelize.Op.or]: [
+            { title: { [Sequelize.Op.iLike]: title } },
+            { slug },
+          ],
+        },
+      });
 
-      if (checkResult.rows.length > 0) {
+      if (existing) {
         return res.status(400).json({ message: 'Status type with this title or slug already exists' });
       }
 
-      const insertQuery = `
-        INSERT INTO status_types (title, slug, description, status, created_at, updated_at)
-        VALUES ($1, $2, $3, $4, NOW(), NOW())
-        RETURNING *;
-      `;
-      const insertValues = [title, slug, description || null, true ];
-      const result = await pgPool.query(insertQuery, insertValues);
+      const newStatusType = await StatusTypes.create({
+        title,
+        slug,
+        description: description || null,
+        status: true,
+        created_at: new Date(),
+        updated_at: new Date(),
+      });
 
-      res.status(201).json(result.rows[0]);
+      res.status(201).json(newStatusType);
     } catch (err) {
       console.error('Error creating status type:', err);
       res.status(500).json({ message: 'Server error while creating status type' });
     }
   },
 
+  // PUT (Update)
   updateStatusType: async (req, res) => {
     const { id } = req.params;
     const { title, description, status } = req.body;
     const slug = title.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '');
 
     try {
-      const query = `
-        UPDATE status_types
-        SET title = $1, slug = $2, description = $3, status = $4, updated_at = NOW()
-        WHERE id = $5
-        RETURNING *;
-      `;
-      const values = [title, slug, description || null, status, id];
-      const result = await pgPool.query(query, values);
+      const [updatedCount, updatedRows] = await StatusTypes.update(
+        {
+          title,
+          slug,
+          description: description || null,
+          status,
+          updated_at: new Date(),
+        },
+        {
+          where: { id },
+          returning: true,
+        }
+      );
 
-      if (result.rowCount === 0) {
+      if (updatedCount === 0) {
         return res.status(404).json({ message: 'Status type not found' });
       }
 
-      res.status(200).json(result.rows[0]);
+      res.status(200).json(updatedRows[0]);
     } catch (err) {
       console.error('Error updating status type:', err);
       res.status(500).json({ message: 'Server error while updating status type' });
     }
   },
 
+  // DELETE
   deleteStatusType: async (req, res) => {
     const { id } = req.params;
 
     try {
-      const query = `
-        DELETE FROM status_types
-        WHERE id = $1
-        RETURNING *;
-      `;
-      const result = await pgPool.query(query, [id]);
+      const deleted = await StatusTypes.destroy({
+        where: { id },
+      });
 
-      if (result.rowCount === 0) {
+      if (!deleted) {
         return res.status(404).json({ message: 'Status type not found' });
       }
 
@@ -144,6 +280,6 @@ module.exports = {
       console.error('Error deleting status type:', err);
       res.status(500).json({ message: 'Server error while deleting status type' });
     }
-  }
-
+  },
 };
+
