@@ -236,19 +236,7 @@ getBatches: async (req, res) => {
     }
  
     try {
-      const duplicateCheck = await Batch.findOne({
-        where: {
-          title: title,
-          start_date: start_date,
-          id: { [Op.ne]: batchId },
-        },
-      })
-
-      if (duplicateCheck) {
-        return res.status(409).json({
-          error: "A batch with the same title and start date already exists.",
-        });
-      }
+      
       const checkBatch = await Batch.findOne({
         where: {
           id: batchId,
