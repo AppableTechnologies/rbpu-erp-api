@@ -496,51 +496,6 @@ const deleteStudent = async (req, res) => {
 module.exports = {
   getStudents,
   createStudent,
-  getStudentById,
   updateStudent,
   deleteStudent,
-};
-const uploadStudentDocuments = async (req, res) => {
-  try {
-    const studentId = req.body.studentId;
-    const files = req.files;
-
-    console.log("Received studentId:", studentId);
-    console.log("Files received:", files);
-
-    if (!studentId) {
-      return res.status(400).json({ error: "Student ID is required" });
-    }
-
-    if (!files || files.length === 0) {
-      return res.status(400).json({ error: "No documents uploaded" });
-    }
-
-    const savedFiles = [];
-
-    for (const file of files) {
-      const ext = path.extname(file.originalname);
-      const filename = `${file.fieldname}-${studentId}-${Date.now()}${ext}`;
-      const filePath = path.join(uploadDir, filename);
-
-      // Save from buffer to disk
-      fs.writeFileSync(filePath, file.buffer);
-
-      savedFiles.push(filename);
-
-      // Optional: insert into database
-      // await pgPool.query(
-      //   "INSERT INTO student_documents (student_id, filename) VALUES ($1, $2)",
-      //   [studentId, filename]
-      // );
-    }
-
-    return res.status(200).json({
-      message: "Documents uploaded successfully",
-      files: savedFiles,
-    });
-  } catch (error) {
-    console.error("Error uploading documents:", error);
-    return res.status(500).json({ error: "Failed to upload documents" });
-  }
 };
