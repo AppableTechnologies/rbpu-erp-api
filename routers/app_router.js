@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const careerCandidateRouter = require("./user_router");
-const menusRouter = require("./menus_router");
+const menusRouter = require("./common/menus_router");
 const facultiesRouter = require("./academic/faculties_router");
 const programsRouter = require("./academic/programs_router");
 const classroomRouter = require("./academic/classroom_router");
@@ -29,8 +29,5 @@ router.use("/api/sessions", sessionRouter);
 router.use("/api/common/dropdown", dropdownRouter);
 router.use("/api/semesters", getSemester);
 router.use("/api/sections", getSections);
-
-
-router.get("/api/test", (req, res) => res.send("✅ Working"));
 
 module.exports = router;
