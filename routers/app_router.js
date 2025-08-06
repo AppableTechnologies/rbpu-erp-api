@@ -11,8 +11,8 @@ const batchesRouter = require("./academic/batches_router");
 const studentsRouter = require("./admission/student_registration_routers");
 const sessionRouter = require("./academic/session_router");
 const dropdownRouter = require("./common/dropdown_router");
-const  getSemester  = require("./academic/Semesters_routes");
-const getSections = require("./academic/section_router");
+const  SemesterRouter  = require("./academic/Semesters_routes");
+const SectionRouter = require("./academic/section_router");
 const studentlistRouter = require('./admission/studentlist_router')
 
 router.use("/api/users", careerCandidateRouter);
@@ -27,7 +27,7 @@ router.use("/api/students", studentsRouter);
 router.use("/api/students_list", studentlistRouter);
 router.use("/api/sessions", sessionRouter);
 router.use("/api/common/dropdown", dropdownRouter);
-router.use("/api/semesters", getSemester);
-router.use("/api/sections", getSections);
+router.use("/api/semesters", SemesterRouter);
+router.use("/api/sections", SectionRouter);
 
 module.exports = router;
