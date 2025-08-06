@@ -6,6 +6,7 @@ const {
   getSessionDropdown,
   getSemesterDropdown,
   getSectionDropdown,
+  getFacultyDropdown,
   getStatusTypesDropdown,
 } = require("../../controllers/common/dropdown_controller");
 
@@ -14,6 +15,8 @@ dropdownRouter.get("/programs", getProgramsDropdown);
 dropdownRouter.get("/sessions", getSessionDropdown);
 dropdownRouter.get("/semesters", getSemesterDropdown);
 dropdownRouter.get("/sections", getSectionDropdown);
+dropdownRouter.get("/faculties", getFacultyDropdown);
 dropdownRouter.get("/status_types", getStatusTypesDropdown);
+
 
 module.exports = dropdownRouter;
