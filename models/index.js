@@ -12,6 +12,8 @@ const ProgramSemester = require("./academic/semester/programSemester.js");
 const StatusTypes = require("./admission/StatusTypes.js");
 const Section = require("./academic/Section.js");
 const ProgramSemesterSection = require("./academic/semester/ProgramSemesterSection.js");
+const Student = require("./admission/Students.js");
+const StudentList = require("./admission/StudentList.js");
 
 // Association
 Menu.hasMany(Submenu, {
@@ -88,6 +90,10 @@ ProgramSemesterSection.belongsTo(Section, { foreignKey: "section_id" });
 // Semester.hasMany(ProgramSemesterSection, { foreignKey: "semester_id" });
 Section.hasMany(ProgramSemesterSection, { foreignKey: "section_id" });
 
+if (Student.associate) {
+  Student.associate({ Program, Faculty, Session, Semester, Section });
+}
+
 module.exports = {
   Menu,
   Submenu,
@@ -103,4 +109,6 @@ module.exports = {
   StatusTypes,
   Section,
   ProgramSemesterSection,
+  Student,  
+  StudentList,
 };

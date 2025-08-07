@@ -1,95 +1,89 @@
-const { pgPool } = require("../../pg_constant");
+const {
+  Student,
+  Program,
+  Faculty,
+  Session,
+  Semester,
+  Section,
+} = require("../../models");
 
-// const getStudents = async (req, res) => {
-//   try {
-//     const result = await pgPool.query("SELECT * FROM students ORDER BY student_id DESC");
-//     res.status(200).json(result.rows);
-//   } catch (error) {
-//     console.error("Error fetching students:", error);
-//     res.status(500).json({ message: "Error fetching students" });
-//   }
-// };
+// ==================== Get All Students ====================
 const getStudents = async (req, res) => {
   try {
-    const query = `
-      SELECT 
-        s.student_id,
-        s.first_name,
-        s.status,
-        p.title AS program,
+    const students = await Student.findAll({
+      include: [
+        { model: Program, as: 'program', attributes: ['title'] },
+        { model: Faculty, as: 'facultyDetail', attributes: ['title'] },
+        { model: Session, as: 'sessionDetail', attributes: ['title'] },
+        { model: Semester, as: 'semesterDetail', attributes: ['title'] },
+        { model: Section, as: 'sectionDetail', attributes: ['title'] }
+      ],
+      order: [['student_id', 'DESC']],
+    });
 
-        json_agg(
-          json_build_object(
-            'semester', sem.title,
-            'section', sec.title,
-            'session', sess.title
-          )
-        ) AS academic_details
-
-      FROM students s
-      LEFT JOIN programs p ON s.program_id = p.id
-      LEFT JOIN program_semester_sections pss ON s.program_id = pss.program_id
-      LEFT JOIN semesters sem ON pss.semester_id = sem.id
-      LEFT JOIN sections sec ON pss.section_id = sec.id
-      LEFT JOIN program_session ps ON s.program_id = ps.program_id
-      LEFT JOIN sessions sess ON ps.session_id = sess.id
-
-      GROUP BY s.student_id, s.first_name, s.status, p.title
-      ORDER BY s.student_id DESC
-    `;
-
-    const result = await pgPool.query(query);
-    res.status(200).json({ students: result.rows });
+    res.status(200).json({ students });
   } catch (error) {
     console.error("Error fetching students:", error);
     res.status(500).json({ message: "Error fetching students" });
   }
 };
 
-
-
-
+// ==================== Get Student by ID ====================
 const getStudentById = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const result = await pgPool.query("SELECT * FROM students WHERE student_id = $1", [id]);
+    const student = await Student.findByPk(id, {
+      include: [
+        { model: Program, as: 'program', attributes: ['title'] },
+        { model: Faculty, as: 'facultyDetail', attributes: ['title'] },
+        { model: Session, as: 'sessionDetail', attributes: ['title'] },
+        { model: Semester, as: 'semesterDetail', attributes: ['title'] },
+        { model: Section, as: 'sectionDetail', attributes: ['title'] }
+      ],
+    });
 
-    if (result.rows.length === 0) {
+    if (!student) {
       return res.status(404).json({ message: "Student not found" });
     }
 
-    res.status(200).json(result.rows[0]);
+    res.status(200).json(student);
   } catch (error) {
     console.error("Error fetching student by ID:", error);
     res.status(500).json({ message: "Error fetching student" });
   }
 };
-const getFaculty = async (req, res) => {
-  try {
-    const result = await pgPool.query("SELECT * FROM faculties");
-    res.status(200).json(result.rows);
-  } catch (error) {
-    console.error("Error fetching faculties:", error);
-    res.status(500).json({ message: "Error fetching faculties" });
-  }
-};
+
+// ==================== Update Student ====================
 const updateStudent = async (req, res) => {
   const { id } = req.params;
-  const { faculty, program, session, semester, section, status } = req.body;
+  const {
+    faculty_id,
+    program_id,
+    session_id,
+    semester_id,
+    section_id,
+    status,
+  } = req.body;
 
   try {
-    await pgPool.query(
-      `UPDATE students
-       SET faculty = $1,
-           program = $2,
-           session = $3,
-           semester = $4,
-           section = $5,
-           status = $6
-       WHERE student_id = $7`,
-      [faculty, program, session, semester, section, status, id]
+    const [updated] = await Student.update(
+      {
+        faculty: faculty_id,
+        program: program_id,
+        session: session_id,
+        semester: semester_id,
+        section: section_id,
+        status,
+      },
+      { where: { student_id: id } }
     );
+
+    if (updated === 0) {
+      return res
+        .status(404)
+        .json({ message: "Student not found or no changes made" });
+    }
 
     res.status(200).json({ message: "Student updated successfully" });
   } catch (error) {
@@ -98,11 +92,17 @@ const updateStudent = async (req, res) => {
   }
 };
 
+// ==================== Delete Student ====================
 const deleteStudent = async (req, res) => {
   const { id } = req.params;
 
   try {
-    await pgPool.query("DELETE FROM students WHERE student_id = $1", [id]);
+    const deleted = await Student.destroy({ where: { student_id: id } });
+
+    if (deleted === 0) {
+      return res.status(404).json({ message: "Student not found" });
+    }
+
     res.status(200).json({ message: "Student deleted successfully" });
   } catch (error) {
     console.error("Error deleting student:", error);
@@ -110,6 +110,22 @@ const deleteStudent = async (req, res) => {
   }
 };
 
+// ==================== Get All Faculties ====================
+const getFaculty = async (req, res) => {
+  try {
+    const faculties = await Faculty.findAll({
+      attributes: ['id', 'title'],
+      order: [['id', 'ASC']],
+    });
+
+    res.status(200).json(faculties);
+  } catch (error) {
+    console.error("Error fetching faculties:", error);
+    res.status(500).json({ message: "Error fetching faculties" });
+  }
+};
+
+// ==================== Export All ====================
 module.exports = {
   getStudents,
   getStudentById,
