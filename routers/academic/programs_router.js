@@ -16,7 +16,7 @@ const router = express.Router();
 const { createPrograms, updatePrograms, deleteProgram } = require("../../controllers/academic/programs_controller");
 const Program = require("../../models/academic/Program");  // <-- add this import
 
-// 👇 Replace getPrograms with inline controller to allow filtering by faculty_id
+//  Replace getPrograms with inline controller to allow filtering by faculty_id
 router.get('/', async (req, res) => {
   const { faculty_id } = req.query;
   try {
@@ -29,6 +29,7 @@ router.get('/', async (req, res) => {
 });
 
 // Keep other routes
+
 router.post("/", createPrograms);
 router.put("/:id", updatePrograms);
 router.delete("/:id", deleteProgram);

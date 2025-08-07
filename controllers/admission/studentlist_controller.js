@@ -7,10 +7,54 @@ const {
   Section,
 } = require("../../models");
 
-// ==================== Get All Students ====================
+// const getStudents = async (req, res) => {
+//   try {
+//     const students = await Student.findAll({
+//       include: [
+//         { model: Program, as: 'program', attributes: ['title'] },
+//         { model: Faculty, as: 'facultyDetail', attributes: ['title'] },
+//         { model: Session, as: 'sessionDetail', attributes: ['title'] },
+//         { model: Semester, as: 'semesterDetail', attributes: ['title'] },
+//         { model: Section, as: 'sectionDetail', attributes: ['title'] }
+//       ],
+//       order: [['student_id', 'DESC']],
+//     });
+
+//     res.status(200).json({ students });
+//   } catch (error) {
+//     console.error("Error fetching students:", error);
+//     res.status(500).json({ message: "Error fetching students" });
+//   }
+// };
+
+// ==================== Get Student by ID ====================
+
+const { Op } = require("sequelize");
+
 const getStudents = async (req, res) => {
   try {
+    const {
+      faculty_id,
+      program_id,
+      session_id,
+      semester_id,
+      section_id,
+      status_id,
+      student_id
+    } = req.query;
+
+    const where = {};
+
+    if (faculty_id) where.faculty = faculty_id;
+    if (program_id) where.program = program_id;
+    if (session_id) where.session = session_id;
+    if (semester_id) where.semester = semester_id;
+    if (section_id) where.section = section_id;
+    if (status_id) where.status = status_id;
+    if (student_id) where.student_id = { [Op.iLike]: `%${student_id}%` };
+
     const students = await Student.findAll({
+      where,
       include: [
         { model: Program, as: 'program', attributes: ['title'] },
         { model: Faculty, as: 'facultyDetail', attributes: ['title'] },
@@ -28,7 +72,6 @@ const getStudents = async (req, res) => {
   }
 };
 
-// ==================== Get Student by ID ====================
 const getStudentById = async (req, res) => {
   const { id } = req.params;
 
