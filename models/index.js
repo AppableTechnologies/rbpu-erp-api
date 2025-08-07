@@ -80,7 +80,7 @@ ProgramSession.belongsTo(Session, { foreignKey: "session_id" });
 ProgramSession.belongsTo(Program, { foreignKey: "program_id" });
 
 Program.belongsTo(Faculty, { foreignKey: "faculty_id", as: "faculty" });
-// Faculty.hasMany(Program, { foreignKey: "faculty_id", as: "programs" });
+Faculty.hasMany(Program, { foreignKey: "faculty_id", as: "programs" });
 
 ProgramSemesterSection.belongsTo(Program, { foreignKey: "program_id" });
 ProgramSemesterSection.belongsTo(Semester, { foreignKey: "semester_id" });
@@ -90,11 +90,54 @@ ProgramSemesterSection.belongsTo(Section, { foreignKey: "section_id" });
 // Semester.hasMany(ProgramSemesterSection, { foreignKey: "semester_id" });
 Section.hasMany(ProgramSemesterSection, { foreignKey: "section_id" });
 
-if (Student.associate) {
-  Student.associate({ Program, Faculty, Session, Semester, Section });
-}
+// if (Student.associate) {
+//   Student.associate({ Program, Faculty, Session, Semester, Section });
+// }
 
-module.exports = {
+
+Student.associate = (models) => {
+  Student.belongsTo(models.Program, {
+    foreignKey: "program_id",
+    as: "program",
+  });
+
+  // Student.belongsTo(models.Faculty, {
+  //   foreignKey: "faculty_id",
+  //   as: "faculty",
+  // });
+
+  Student.belongsTo(models.Session, {
+    foreignKey: "session_id",
+    as: "session",
+  });
+
+  // Student.belongsTo(models.Semester, {
+  //   foreignKey: "semester_id",
+  //   as: "semester",
+  // });
+
+  // Student.belongsTo(models.Section, {
+  //   foreignKey: "section_id",
+  //   as: "section",
+  // });
+};
+
+
+// models/Program.js
+Program.belongsToMany(Session, {
+  through: 'program_session',
+  foreignKey: 'program_id',
+  otherKey: 'session_id',
+});
+
+// models/Session.js
+Session.belongsToMany(Program, {
+  through: 'program_session',
+  foreignKey: 'session_id',
+  otherKey: 'program_id',
+});
+
+const models = {
   Menu,
   Submenu,
   Classroom,
@@ -109,6 +152,15 @@ module.exports = {
   StatusTypes,
   Section,
   ProgramSemesterSection,
-  Student,  
+  Student,
   StudentList,
 };
+
+module.exports =models
+
+// Call associate if present
+Object.keys(models).forEach((modelName) => {
+  if (models[modelName].associate) {
+    models[modelName].associate(models);
+  }
+});
