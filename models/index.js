@@ -9,6 +9,9 @@ const Menu = require("./common/Menus.js");
 const Submenu = require("./common/SubMenus.js");
 const Semester = require("./academic/semester/Semester.js");
 const ProgramSemester = require("./academic/semester/programSemester.js");
+const StatusTypes = require("./admission/StatusTypes.js");
+const Section = require("./academic/Section.js");
+const ProgramSemesterSection = require("./academic/semester/ProgramSemesterSection.js");
 
 // Association
 Menu.hasMany(Submenu, {
@@ -47,15 +50,14 @@ Program.belongsToMany(Batch, {
 Semester.belongsToMany(Program, {
   through: ProgramSemester,
   foreignKey: "semester_id",
-  otherKey: "program_id"
+  otherKey: "program_id",
 });
 
 Program.belongsToMany(Semester, {
   through: ProgramSemester,
   foreignKey: "program_id",
-  otherKey: "semester_id"
+  otherKey: "semester_id",
 });
-
 
 Semester.hasMany(ProgramSemester, { foreignKey: "semester_id" });
 ProgramSemester.belongsTo(Semester, { foreignKey: "semester_id" });
@@ -69,14 +71,22 @@ BatchProgram.belongsTo(Batch, { foreignKey: "batch_id" });
 BatchProgram.belongsTo(Program, { foreignKey: "program_id" });
 
 // Optional reverse relations (useful for includes)
-Session.hasMany(ProgramSession, { foreignKey: "session_id" });
-Program.hasMany(ProgramSession, { foreignKey: "program_id" });
+// Session.hasMany(ProgramSession, { foreignKey: "session_id" });
+// Program.hasMany(ProgramSession, { foreignKey: "program_id" });
 
 ProgramSession.belongsTo(Session, { foreignKey: "session_id" });
 ProgramSession.belongsTo(Program, { foreignKey: "program_id" });
 
 Program.belongsTo(Faculty, { foreignKey: "faculty_id", as: "faculty" });
-Faculty.hasMany(Program, { foreignKey: "faculty_id", as: "programs" });
+// Faculty.hasMany(Program, { foreignKey: "faculty_id", as: "programs" });
+
+ProgramSemesterSection.belongsTo(Program, { foreignKey: "program_id" });
+ProgramSemesterSection.belongsTo(Semester, { foreignKey: "semester_id" });
+ProgramSemesterSection.belongsTo(Section, { foreignKey: "section_id" });
+
+// Program.hasMany(ProgramSemesterSection, { foreignKey: "program_id" });
+// Semester.hasMany(ProgramSemesterSection, { foreignKey: "semester_id" });
+Section.hasMany(ProgramSemesterSection, { foreignKey: "section_id" });
 
 module.exports = {
   Menu,
@@ -87,8 +97,10 @@ module.exports = {
   ProgramSession,
   Session,
   Batch,
-  BatchProgram, 
+  BatchProgram,
   Semester,
-  ProgramSemester
-
+  ProgramSemester,
+  StatusTypes,
+  Section,
+  ProgramSemesterSection,
 };
