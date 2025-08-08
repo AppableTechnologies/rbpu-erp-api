@@ -48,7 +48,7 @@ const sessionRouter = require("./academic/session_router");
 const dropdownRouter = require("./common/dropdown_router");
 const  SemesterRouter  = require("./academic/Semesters_routes");
 const SectionRouter = require("./academic/section_router");
-const studentlistRouter = require('./admission/studentlist_router')
+const studentlistRouter = require('./admission/student_list/index_router')
 router.use("/api/users", careerCandidateRouter);
 router.use("/api/menus", menusRouter);
 router.use("/api/faculties",facultiesRouter);
