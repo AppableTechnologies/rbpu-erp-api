@@ -28,12 +28,12 @@ const {
   getFaculty,
   getProgramsViaFacultyId,
   getSessionsViaProgramId
-} = require("../../controllers/admission/studentlist_controller");
+} = require("../../../controllers/admission/student_list/faculty_program_controller");
 router.get("/", getStudents);
 // router.get("/:id", getStudentById);
 router.put("/:id", updateStudent);
 router.delete("/:id", deleteStudent);
 router.get("/faculties", getFaculty);
 router.get("/programs", getProgramsViaFacultyId);
-router.get("/sessions-by-program", getSessionsViaProgramId);
+
 module.exports = router;
