@@ -89,6 +89,7 @@ const createStudent = async (req, res) => {
       marital_status,
       blood_group,
       nationality,
+      national_id,
       passport_no,
       school_name,
       school_exam_id,
@@ -167,7 +168,7 @@ const createStudent = async (req, res) => {
       marital_status: marital_status,
       blood_group: blood_group,
       nationality: nationality,
-      //national_id:national_id,
+      national_id:national_id,
 
       passport_no: passport_no,
       school_name: school_name,
