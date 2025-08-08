@@ -216,53 +216,53 @@ const getStudents = async (req, res) => {
     res.status(500).json({ message: "Error fetching students" });
   }
 };
-const getStudentById = async (req, res) => {
-  const { id } = req.params;
-  try {
-    // const student = await Student.findByPk(id, {
-    //   // include: [
-    //   //   { model: Program, as: 'program', attributes: ['title'] },
-    //   //   { model: Faculty, as: 'facultyDetail', attributes: ['title'] },
-    //   //   { model: Session, as: 'sessionDetail', attributes: ['title'] },
-    //   //   { model: Semester, as: 'semesterDetail', attributes: ['title'] },
-    //   //   { model: Section, as: 'sectionDetail', attributes: ['title'] }
-    //   // ],
-    //   include: [
-    //     { model: Program, as: 'program', attributes: ['title'] },
-    //     // { model: Faculty, as: 'faculty', attributes: ['title'] },
-    //     { model: Session, as: 'session', attributes: ['title'] },
-    //     { model: Semester, as: 'semester', attributes: ['title'] },
-    //     { model: Section, as: 'section', attributes: ['title'] }
-    //   ],
-    // });
-    const student = await Student.findByPk(id, {
-      include: [
-        {
-          model: Program,
-          as: "program",
-          attributes: ["title"],
-          include: [
-            {
-              model: Faculty,
-              as: "faculty",
-              attributes: ["title"],
-            },
-          ],
-        },
-        { model: Session, as: "session", attributes: ["title"] },
-        { model: Semester, as: "semester", attributes: ["title"] },
-        { model: Section, as: "section", attributes: ["title"] },
-      ],
-    });
-    if (!student) {
-      return res.status(404).json({ message: "Student not found" });
-    }
-    res.status(200).json(student);
-  } catch (error) {
-    console.error("Error fetching student by ID:", error);
-    // res.status(500).json({ message: "Error fetching student" });
-  }
-};
+// const getStudentById = async (req, res) => {
+//   const { id } = req.params;
+//   try {
+//     // const student = await Student.findByPk(id, {
+//     //   // include: [
+//     //   //   { model: Program, as: 'program', attributes: ['title'] },
+//     //   //   { model: Faculty, as: 'facultyDetail', attributes: ['title'] },
+//     //   //   { model: Session, as: 'sessionDetail', attributes: ['title'] },
+//     //   //   { model: Semester, as: 'semesterDetail', attributes: ['title'] },
+//     //   //   { model: Section, as: 'sectionDetail', attributes: ['title'] }
+//     //   // ],
+//     //   include: [
+//     //     { model: Program, as: 'program', attributes: ['title'] },
+//     //     // { model: Faculty, as: 'faculty', attributes: ['title'] },
+//     //     { model: Session, as: 'session', attributes: ['title'] },
+//     //     { model: Semester, as: 'semester', attributes: ['title'] },
+//     //     { model: Section, as: 'section', attributes: ['title'] }
+//     //   ],
+//     // });
+//     const student = await Student.findByPk(id, {
+//       include: [
+//         {
+//           model: Program,
+//           as: "program",
+//           attributes: ["title"],
+//           include: [
+//             {
+//               model: Faculty,
+//               as: "faculty",
+//               attributes: ["title"],
+//             },
+//           ],
+//         },
+//         { model: Session, as: "session", attributes: ["title"] },
+//         { model: Semester, as: "semester", attributes: ["title"] },
+//         { model: Section, as: "section", attributes: ["title"] },
+//       ],
+//     });
+//     if (!student) {
+//       return res.status(404).json({ message: "Student not found" });
+//     }
+//     res.status(200).json(student);
+//   } catch (error) {
+//     console.error("Error fetching student by ID:", error);
+//     // res.status(500).json({ message: "Error fetching student" });
+//   }
+// };
 // ==================== Update Student ====================
 const updateStudent = async (req, res) => {
   const { id } = req.params;
@@ -375,7 +375,7 @@ const getSessionsViaProgramId = async (req, res) => {
 // ==================== Export All ====================
 module.exports = {
   getStudents,
-  getStudentById,
+  // getStudentById,
   updateStudent,
   deleteStudent,
   getFaculty,

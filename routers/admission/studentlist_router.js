@@ -30,7 +30,7 @@ const {
   getSessionsViaProgramId
 } = require("../../controllers/admission/studentlist_controller");
 router.get("/", getStudents);
-router.get("/:id", getStudentById);
+// router.get("/:id", getStudentById);
 router.put("/:id", updateStudent);
 router.delete("/:id", deleteStudent);
 router.get("/faculties", getFaculty);
