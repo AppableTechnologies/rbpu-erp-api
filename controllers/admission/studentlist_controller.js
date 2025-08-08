@@ -128,6 +128,7 @@ const getStudentById = async (req, res) => {
     //   ],
 
     // });
+    //
 
      const student = await Student.findByPk(id, {
       include: [
