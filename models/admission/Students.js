@@ -206,6 +206,6 @@ const Student = sequelize.define('Student', {
   tableName: 'students',
   timestamps: false, // Set to true if you want Sequelize to auto-manage createdAt/updatedAt
   
-});
+})
 
 module.exports = Student;
