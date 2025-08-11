@@ -29,7 +29,7 @@ module.exports = {
                 ORDER BY st.id ASC;`;
 
         const dataResult = await pgPool.query(dataQuery);
-        return res.status(200).json({ data: dataResult.rows });
+        return res.status(200).json( dataResult.rows );
       } else {
         // For paginated semsters
         // First get the semesters IDs for the current page
