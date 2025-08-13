@@ -59,6 +59,19 @@ Program.belongsToMany(Semester, {
   otherKey: "semester_id",
 });
 
+// Many-to-many between Semester and Section via ProgramSemesterSection
+Semester.belongsToMany(Section, {
+  through: ProgramSemesterSection,
+  foreignKey: "semester_id",
+  otherKey: "section_id"
+});
+
+Section.belongsToMany(Semester, {
+  through: ProgramSemesterSection,
+  foreignKey: "section_id",
+  otherKey: "semester_id"
+});
+
 Semester.hasMany(ProgramSemester, { foreignKey: "semester_id" });
 ProgramSemester.belongsTo(Semester, { foreignKey: "semester_id" });
 Program.hasMany(ProgramSemester, { foreignKey: "program_id" });
