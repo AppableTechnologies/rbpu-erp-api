@@ -1,4 +1,4 @@
-const { Program, Session, Semester, Section } = require("../../../models");
+const { Program, Session, Semester, Section, ProgramSemesterSection } = require("../../../models");
 
 const getSemestersViaProgramId = async (req, res) => {
   const { program_id } = req.query;
@@ -28,24 +28,28 @@ const getSemestersViaProgramId = async (req, res) => {
 
 const getSectionsViaSemesterId = async (req, res) => {
   const { semester_id } = req.query;
+
   try {
     if (!semester_id) {
-      return res.status(400).json({ message: "Missing session_id in query." });
+      return res.status(400).json({ message: "Missing semester_id in query." });
     }
-    const sections = await Program.findByPk(semester_id, {
+
+    const semester = await Semester.findByPk(semester_id, {
       include: [
         {
           model: Section,
           attributes: ["id", "title"],
-          through: { attributes: [] }, // skip join table details
+          through: { attributes: [] }, // skip join table fields
         },
       ],
       order: [[Section, "id", "ASC"]],
     });
-    if (!sections) {
-      return res.status(404).json({ message: "Section not found." });
+
+    if (!semester) {
+      return res.status(404).json({ message: "Semester not found." });
     }
-    res.status(200).json(sections.Sections);
+
+    res.status(200).json(semester.Sections);
   } catch (error) {
     console.error("Error fetching sections by semesterID:", error);
     res.status(500).json({ message: "Error fetching sections." });
