@@ -3,9 +3,11 @@ const router = express.Router();
 // const { getProgramsViaFacultyId, getSessionsViaProgramId } = require("../../controllers/admission/studentlist_controller");
 
 const {
-  getSemestersViaSessionId
+  getSemestersViaProgramId,
+  getSectionsViaSemesterId
 } = require("../../../controllers/admission/student_list/session_semester_section");
 
-router.get("/semesters-by-session", getSemestersViaSessionId);
+router.get("/semesters-by-session", getSemestersViaProgramId);
+router.get("/sections-by-semester", getSectionsViaSemesterId);
 
 module.exports = router;
