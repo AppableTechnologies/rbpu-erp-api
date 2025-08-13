@@ -50,6 +50,8 @@ const  SemesterRouter  = require("./academic/Semesters_routes");
 const SectionRouter = require("./academic/section_router");
 const studentlistRouter = require('./admission/student_list/index_router')
 const FeesTypesRouter = require("./fees/feestypes_router");
+const SubjectRouter = require("./academic/subject_routes");
+
 router.use("/api/users", careerCandidateRouter);
 router.use("/api/menus", menusRouter);
 router.use("/api/faculties",facultiesRouter);
@@ -64,4 +66,5 @@ router.use("/api/common/dropdown", dropdownRouter);
 router.use("/api/semesters", SemesterRouter);
 router.use("/api/sections", SectionRouter);
 router.use("/api/feestypes", FeesTypesRouter);
+router.use("/api/subjects", SubjectRouter);
 module.exports = router;
