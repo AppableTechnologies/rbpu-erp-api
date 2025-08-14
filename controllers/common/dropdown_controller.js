@@ -4,6 +4,7 @@ const {
   Program,
   Session,
   Semester,
+  Section,
   Faculty,
   StatusTypes,
 } = require("../../models");
@@ -13,7 +14,7 @@ const modelMap = {
   programs: Program,
   sessions: Session,
   semesters: Semester,
-  // sections: Section,
+  sections: Section,
   faculties: Faculty,
   status_types: StatusTypes,
 };
