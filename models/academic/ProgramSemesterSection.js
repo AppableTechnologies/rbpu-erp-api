@@ -1,27 +1,31 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../../pg_constant");
 
-const ProgramSession = sequelize.define(
-  "ProgramSession",
+const ProgramSemesterSection = sequelize.define(
+  "ProgramSemesterSection",
   {
-    program_sem_id: {
+    id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
-    },
-    session_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
     },
     program_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
+    semester_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    session_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
   },
   {
-    tableName: "program_session",
+    tableName: "program_semester_sections",
     timestamps: false,
   }
 );
 
-module.exports = ProgramSession;
+module.exports = ProgramSemesterSection;

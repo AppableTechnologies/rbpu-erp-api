@@ -12,7 +12,8 @@ const ProgramSemester = require("./academic/semester/programSemester.js");
 const StatusTypes = require("./admission/StatusTypes.js");
 const Section = require("./academic/Section.js");
 const ProgramSemesterSection = require("./academic/semester/ProgramSemesterSection.js");
-
+const ProgramSubject = require("./academic/subject/programSubject.js");
+const Subject = require("./academic/subject/subjects.js");
 // Association
 Menu.hasMany(Submenu, {
   foreignKey: "menu_id_fk",
@@ -59,6 +60,30 @@ Program.belongsToMany(Semester, {
   otherKey: "semester_id",
 });
 
+// Remove all existing associations and use just these:
+
+Subject.belongsToMany(Program, {
+  through: ProgramSubject, // Use the exact model name
+  foreignKey: 'subject_id'
+});
+
+Program.belongsToMany(Subject, {
+  through: ProgramSubject, // Use the exact model name
+  foreignKey: 'program_id'
+});
+// Many-to-many between Semester and Section via ProgramSemesterSection
+Semester.belongsToMany(Section, {
+  through: ProgramSemesterSection,
+  foreignKey: "semester_id",
+  otherKey: "section_id"
+});
+
+Section.belongsToMany(Semester, {
+  through: ProgramSemesterSection,
+  foreignKey: "section_id",
+  otherKey: "semester_id"
+});
+
 Semester.hasMany(ProgramSemester, { foreignKey: "semester_id" });
 ProgramSemester.belongsTo(Semester, { foreignKey: "semester_id" });
 Program.hasMany(ProgramSemester, { foreignKey: "program_id" });
@@ -103,4 +128,6 @@ module.exports = {
   StatusTypes,
   Section,
   ProgramSemesterSection,
+  Subject,
+  ProgramSubject
 };
