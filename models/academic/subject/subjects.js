@@ -17,11 +17,10 @@ const Subject = sequelize.define(
       type: DataTypes.STRING(191),
       allowNull: false,
     },
-    credit_hour:{
+    credit_hour: {
       type: DataTypes.INTEGER,
       allowNull: false,
-    }
-    ,
+    },
     subject_type: {
       type: DataTypes.INTEGER,
       allowNull: false,
