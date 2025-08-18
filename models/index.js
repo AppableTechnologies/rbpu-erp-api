@@ -105,6 +105,7 @@ ProgramSession.belongsTo(Program, { foreignKey: "program_id" });
 
 Program.belongsTo(Faculty, { foreignKey: "faculty_id", as: "faculty" });
 Faculty.hasMany(Program, { foreignKey: "faculty_id", as: "programs" });
+// Faculty.hasMany(Program, { foreignKey: "faculty_id", as: "programs" });
 
 ProgramSemesterSection.belongsTo(Program, { foreignKey: "program_id" });
 ProgramSemesterSection.belongsTo(Semester, { foreignKey: "semester_id" });

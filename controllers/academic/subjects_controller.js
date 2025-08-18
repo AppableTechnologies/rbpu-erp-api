@@ -1,4 +1,4 @@
-const { Subject, Program, ProgramSubject } = require("../../models");
+const { Subject, Program, ProgramSubject ,Faculty} = require("../../models");
 const { pgPool } = require("../../pg_constant");
 const sequelize = require("../../pg_constant");
 const { Op } = require("sequelize");
@@ -315,4 +315,134 @@ module.exports = {
         .json({ error: "Server error while deleting subject." });
     }
   },
+getFilteredSubjects: async (req, res) => {
+    const { faculty_id, program_id, subject_type, class_type } = req.query;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
+    try {
+        // 1. Validate program exists if provided
+        let program;
+        if (program_id) {
+            program = await Program.findByPk(program_id, {
+                include: [{
+                    model: Faculty,
+                    as: 'faculty'
+                }]
+            });
+            
+            if (!program) {
+                return res.status(404).json({
+                    error: `Program ${program_id} not found`,
+                    suggestion: 'Check available programs first'
+                });
+            }
+        }
+
+        // 2. Validate faculty-program relationship if both provided
+        if (program_id && faculty_id && program.faculty_id != faculty_id) {
+            return res.status(400).json({
+                error: `Program ${program_id} belongs to faculty ${program.faculty_id}`,
+                actual_faculty: {
+                    id: program.faculty_id,
+                    title: program.faculty?.title || 'Unknown'
+                },
+                solution: `Use faculty_id=${program.faculty_id} instead`
+            });
+        }
+
+        // 3. Build the base query options
+        const queryOptions = {
+            attributes: [
+                "id", "title", "code", "credit_hour", "subject_type",
+                "class_type", "total_marks", "passing_marks",
+                "description", "status", "created_at", "updated_at"
+            ],
+            include: [{
+                model: Program,
+                through: { attributes: [] },
+                attributes: ["id", "title", "faculty_id"],
+                required: true,
+                include: [{
+                    model: Faculty,
+                    as: "faculty",
+                    attributes: ["id", "title"]
+                }]
+            }],
+            where: {},
+            limit,
+            offset,
+            order: [["id", "ASC"]]
+        };
+
+        // Apply program filter
+        if (program_id) {
+            queryOptions.include[0].where = { id: program_id };
+        }
+
+        // Apply faculty filter (only if not already handled by program filter)
+        if (faculty_id && !program_id) {
+            queryOptions.include[0].where = { faculty_id };
+        }
+
+        // Apply subject filters
+        if (subject_type) queryOptions.where.subject_type = subject_type;
+        if (class_type) queryOptions.where.class_type = class_type;
+
+        // 4. Get the count in a separate query to avoid complex joins
+        const countQuery = {
+            include: [{
+                model: Program,
+                through: { attributes: [] },
+                required: true,
+                where: queryOptions.include[0].where || {}
+            }],
+            where: queryOptions.where
+        };
+
+        const count = await Subject.count(countQuery);
+
+        // 5. Get the paginated results
+        const subjects = await Subject.findAll(queryOptions);
+
+        // 6. Format the response
+        const formattedSubjects = subjects.map(subject => {
+            const subjectJson = subject.toJSON();
+            return {
+                ...subjectJson,
+                programs: subjectJson.Programs.map(program => ({
+                    program_id: program.id,
+                    program_title: program.title,
+                    faculty_id: program.faculty_id,
+                    faculty_title: program.faculty?.title || null
+                })),
+                Programs: undefined
+            };
+        });
+
+        return res.status(200).json({
+            data: formattedSubjects,
+            pagination: {
+                totalItems: count,
+                totalPages: Math.ceil(count / limit),
+                currentPage: page,
+                limit
+            },
+            filters_applied: {
+                faculty_id: program_id ? program.faculty_id : faculty_id,
+                program_id,
+                subject_type,
+                class_type
+            }
+        });
+
+    } catch (error) {
+        console.error("Error filtering subjects:", error);
+        return res.status(500).json({ error: "Error filtering subjects" });
+    }
+}
+
+
+
 };
