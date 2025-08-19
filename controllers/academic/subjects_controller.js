@@ -196,20 +196,7 @@ module.exports = {
       program_ids,
     } = req.body;
 
-    if (
-      !title ||
-      !code ||
-      !credit_hour ||
-      !subject_type ||
-      !class_type ||
-      !Array.isArray(program_ids)
-    ) {
-      return res
-        .status(400)
-        .json({
-          error: "All required fields must be provided with valid data",
-        });
-    }
+   
 
     try {
       const subject = await Subject.findByPk(courseId);
