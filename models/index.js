@@ -14,6 +14,8 @@ const Section = require("./academic/Section.js");
 const ProgramSemesterSection = require("./academic/semester/ProgramSemesterSection.js");
 const ProgramSubject = require("./academic/subject/programSubject.js");
 const Subject = require("./academic/subject/subjects.js");
+const EnrollSubject = require("./academic/enroll_subject/EnrollSubject.js");
+const EnrollSubjectSubject = require("./academic/enroll_subject/EnrollSubjectSubject.js");
 // Association
 Menu.hasMany(Submenu, {
   foreignKey: "menu_id_fk",
@@ -64,24 +66,24 @@ Program.belongsToMany(Semester, {
 
 Subject.belongsToMany(Program, {
   through: ProgramSubject, // Use the exact model name
-  foreignKey: 'subject_id'
+  foreignKey: "subject_id",
 });
 
 Program.belongsToMany(Subject, {
   through: ProgramSubject, // Use the exact model name
-  foreignKey: 'program_id'
+  foreignKey: "program_id",
 });
 // Many-to-many between Semester and Section via ProgramSemesterSection
 Semester.belongsToMany(Section, {
   through: ProgramSemesterSection,
   foreignKey: "semester_id",
-  otherKey: "section_id"
+  otherKey: "section_id",
 });
 
 Section.belongsToMany(Semester, {
   through: ProgramSemesterSection,
   foreignKey: "section_id",
-  otherKey: "semester_id"
+  otherKey: "semester_id",
 });
 
 Semester.hasMany(ProgramSemester, { foreignKey: "semester_id" });
@@ -114,6 +116,47 @@ ProgramSemesterSection.belongsTo(Section, { foreignKey: "section_id" });
 // Semester.hasMany(ProgramSemesterSection, { foreignKey: "semester_id" });
 Section.hasMany(ProgramSemesterSection, { foreignKey: "section_id" });
 
+// EnrollSubject relations
+
+Section.hasMany(EnrollSubject, { foreignKey: "section_id" });
+// Subject.hasMany(EnrollSubject, { foreignKey: "subject_id" });
+
+EnrollSubject.belongsTo(Program, { foreignKey: "program_id", as: "program" });
+Program.hasMany(EnrollSubject, {
+  foreignKey: "program_id",
+  as: "enrollSubjects",
+});
+
+EnrollSubject.belongsTo(Semester, {
+  foreignKey: "semester_id",
+  as: "semester",
+});
+Semester.hasMany(EnrollSubject, { foreignKey: "semester_id" });
+
+
+EnrollSubject.belongsTo(Section, { foreignKey: "section_id", as: "section" });
+// EnrollSubject.belongsTo(Subject, { foreignKey: "subject_id", as: "subject" });
+
+// EnrollSubjectSubject.belongsTo(Subject, { foreignKey: "subject_id" });
+// Subject.hasMany(EnrollSubjectSubject, { foreignKey: "enroll_subject_id" });
+
+EnrollSubject.belongsToMany(Subject, {
+  through: EnrollSubjectSubject,
+  foreignKey: "enroll_subject_id",
+  otherKey:"subject_id"
+});
+Subject.belongsToMany(EnrollSubject, {
+  through: EnrollSubjectSubject,
+  foreignKey: "subject_id",
+  otherKey:"enroll_subject_id"
+});
+
+// Optional: direct belongsTo if you want easy access to the subject from the join
+EnrollSubjectSubject.belongsTo(Subject, { foreignKey: "subject_id" });
+EnrollSubjectSubject.belongsTo(EnrollSubject, { foreignKey: "enroll_subject_id" });
+EnrollSubjectSubject.belongsTo(EnrollSubject, { foreignKey: "enroll_subject_id" });
+
+
 module.exports = {
   Menu,
   Submenu,
@@ -130,5 +173,7 @@ module.exports = {
   Section,
   ProgramSemesterSection,
   Subject,
-  ProgramSubject
+  ProgramSubject,
+  EnrollSubject,
+  EnrollSubjectSubject,
 };

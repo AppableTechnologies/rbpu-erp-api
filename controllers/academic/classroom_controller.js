@@ -123,9 +123,18 @@ const updateClassroom = async (req, res) => {
   const { id } = req.params;
   const { room_no, floor, capacity, type, status } = req.body;
   const slug = generateSlug(room_no);
-  if (!room_no || !floor || !capacity || !type || !status) {
+
+  const requiredFields = { room_no, floor, capacity, type, status };
+
+  if (
+    Object.values(requiredFields).some((v) => v === undefined || v === null)
+  ) {
     return res.status(400).json({ message: "All fields are required" });
   }
+
+  // if (!room_no || !floor || !capacity || !type || !status) {
+  //   return res.status(400).json({ message: "All fields are required" });
+  // }
 
   try {
     const existingClassroom = await Classroom.findByPk(id);
