@@ -261,4 +261,43 @@ module.exports.deleteEnrollCourse = async (req, res) => {
     console.error("Error deleting enroll course:", error);
     res.status(500).json({ error: "Something went wrong" });
   }
+
+  // GET /api/programs?faculty_id=1
+};
+
+module.exports.getSubjectsVia_Prog_Sem_Section = async (req, res) => {
+  const { program_id, semester_id, section_id } = req.query;
+
+  try {
+    if (!program_id || !semester_id || !section_id) {
+      return res.status(400).json({ error: "Missing required parameters" });
+    }
+
+    const enrollSubject = await EnrollSubject.findOne({
+      where: { program_id, semester_id, section_id },
+      include: [
+        {
+          model: Subject,
+          attributes: ["id", "title", "code"],
+          through: {
+            attributes: [
+              // "enroll_subject_id_pk",
+              // "enroll_subject_id",
+              // "subject_id",
+            ],
+          },
+        },
+      ],
+    });
+
+    if (!enrollSubject) {
+      return res.status(204).json({ error: "Enroll course not found" });
+    }
+    return res.status(200).json(enrollSubject.Subjects);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      error: "Something went  wrong inside getSubjectsVia_Prog_Sem_Section",
+    });
+  }
 };
