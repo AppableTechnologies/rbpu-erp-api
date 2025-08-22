@@ -7,7 +7,7 @@ const {
   getSectionsViaSemesterId
 } = require("../../../controllers/admission/student_list/session_semester_section");
 
-router.get("/semesters-by-session", getSemestersViaProgramId);
+router.get("/semesters-by-program", getSemestersViaProgramId);
 router.get("/sections-by-semester", getSectionsViaSemesterId);
 
 module.exports = router;
