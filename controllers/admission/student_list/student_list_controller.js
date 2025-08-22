@@ -1,4 +1,4 @@
-const { Student, Faculty, Program, Session, Semester, Section } = require("../../models");
+const { Student, Faculty, Program, Session, Semester, Section } = require("../../../models");
 const { Op } = require("sequelize");
 
 module.exports = {
@@ -63,6 +63,26 @@ module.exports = {
     } catch (err) {
       console.error("Error fetching students:", err);
       return res.status(500).json({ error: "Failed to fetch students" });
+    }
+  },
+
+
+  getStudentById: async (req, res) => {
+    try {
+      const { id } = req.params;
+      
+     const student = await Student.findOne({
+      where: { student_id: id },
+    });
+
+      if (!student) {
+        return res.status(404).json({ error: "Student not found" });
+      }
+
+      return res.status(200).json(student);
+    } catch (err) {
+      console.error("Error fetching student by ID:", err);
+      return res.status(500).json({ error: "Failed to fetch student" });
     }
   },
 };
