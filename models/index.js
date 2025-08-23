@@ -16,6 +16,8 @@ const ProgramSubject = require("./academic/subject/programSubject.js");
 const Subject = require("./academic/subject/subjects.js");
 const EnrollSubject = require("./academic/enroll_subject/EnrollSubject.js");
 const EnrollSubjectSubject = require("./academic/enroll_subject/EnrollSubjectSubject.js");
+const Student = require("./admission/Students.js");
+const StudentList = require("./admission/StudentList.js");
 // Association
 Menu.hasMany(Submenu, {
   foreignKey: "menu_id_fk",
@@ -176,4 +178,6 @@ module.exports = {
   ProgramSubject,
   EnrollSubject,
   EnrollSubjectSubject,
+  Student,        
+  StudentList,
 };

@@ -61,6 +61,32 @@ const getSemestersViaProgramId = async (req, res) => {
     res.status(500).json({ message: "Error fetching semester." });
   }
 };
+const getSemestersBySession = async (req, res) => {
+  const { program_id, session_id } = req.query;
+  if (!program_id || !session_id) {
+    return res.status(400).json({ message: "Missing program_id or session_id" });
+  }
+
+  try {
+    // Assuming you have a join table ProgramSemesterSection
+    const semesters = await Semester.findAll({
+      include: [
+        {
+          model: ProgramSemesterSection,
+          where: { program_id, session_id },
+          attributes: [],
+        },
+      ],
+      attributes: ["id", "title"],
+      order: [["id", "ASC"]],
+    });
+
+    res.status(200).json({ data: semesters });
+  } catch (error) {
+    console.error("Error fetching semesters by session:", error);
+    res.status(500).json({ message: "Error fetching semesters" });
+  }
+};
 
 
 const getSectionsViaSemesterId = async (req, res) => {

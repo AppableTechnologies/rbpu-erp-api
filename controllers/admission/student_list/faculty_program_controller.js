@@ -115,7 +115,7 @@
 //   getFaculty,
 // };
 
-const {
+const { 
   Student,
   Program,
   Faculty,
@@ -154,14 +154,29 @@ const getStudents = async (req, res) => {
       status_id,
       student_id,
     } = req.query;
+     if (
+      !faculty_id &&
+      !program_id &&
+      !session_id &&
+      !semester_id &&
+      !section_id &&
+      !status_id &&
+      !student_id
+    ) {
+      return res.status(200).json({ students: [] });
+    }
+
     const where = {};
-    if (faculty_id) where.faculty = faculty_id;
-    if (program_id) where.program = program_id;
-    if (session_id) where.session = session_id;
-    if (semester_id) where.semester = semester_id;
-    if (section_id) where.section = section_id;
+    if (program_id) where.program_id = program_id;
+    if (session_id) where.session_id = session_id;
+    if (semester_id) where.semester_id = semester_id;
+    if (section_id) where.section_id = section_id;
     if (status_id) where.status = status_id;
-    if (student_id) where.student_id = { [Op.iLike]: `%${student_id}%` };
+    if (student_id) {
+      // case-insensitive search for student id
+      where.student_id = { [Op.iLike]: `%${student_id}%` };
+    }
+
     //     const students = await Student.findAll({
     //       where,
     //       // include: [
@@ -180,29 +195,21 @@ const getStudents = async (req, res) => {
     // ],
     //       order: [['student_id', 'DESC']],
     //     });
-    const students = await Student.findAll({
+   const students = await Student.findAll({
       where,
       include: [
         {
           model: Program,
           as: "program",
           attributes: ["title"],
-          include: faculty_id
-            ? [
-                {
-                  model: Faculty,
-                  as: "faculty",
-                  attributes: ["title"],
-                  where: { id: faculty_id },
-                },
-              ]
-            : [
-                {
-                  model: Faculty,
-                  as: "faculty",
-                  attributes: ["title"],
-                },
-              ],
+          include: [
+            {
+              model: Faculty,
+              as: "faculty",
+              attributes: ["title"],
+              ...(faculty_id ? { where: { id: faculty_id } } : {}),
+            },
+          ],
         },
         { model: Session, as: "session", attributes: ["title"] },
         { model: Semester, as: "semester", attributes: ["title"] },
@@ -210,6 +217,7 @@ const getStudents = async (req, res) => {
       ],
       order: [["student_id", "DESC"]],
     });
+
     res.status(200).json({ students });
   } catch (error) {
     console.error("Error fetching students:", error);
