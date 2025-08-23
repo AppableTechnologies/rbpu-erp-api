@@ -75,6 +75,15 @@ Program.belongsToMany(Subject, {
   through: ProgramSubject, // Use the exact model name
   foreignKey: "program_id",
 });
+
+ProgramSubject.belongsTo(Program, { foreignKey: "program_id" });
+ProgramSubject.belongsTo(Subject, { foreignKey: "subject_id" });
+
+Program.hasMany(ProgramSubject, { foreignKey: "program_id" });
+Subject.hasMany(ProgramSubject, { foreignKey: "subject_id" });
+
+
+
 // Many-to-many between Semester and Section via ProgramSemesterSection
 Semester.belongsToMany(Section, {
   through: ProgramSemesterSection,
