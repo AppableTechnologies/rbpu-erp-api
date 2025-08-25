@@ -18,6 +18,10 @@ const EnrollSubject = require("./academic/enroll_subject/EnrollSubject.js");
 const EnrollSubjectSubject = require("./academic/enroll_subject/EnrollSubjectSubject.js");
 const Student = require("./admission/Students.js");
 const StudentList = require("./admission/StudentList.js");
+const FeesDiscounts = require("./fees/feesDiscount/FeesDiscounts.js");
+const FeesDiscountsStatusTypes = require("./fees/feesDiscount/feesDiscountStatusTypes.js");
+const FeesTypes = require("./fees/FeesTypes.js");
+const FeesCategoryFeesDiscount = require("./fees/feesDiscount/FeesCategoryFeesDiscount.js");
 // Association
 Menu.hasMany(Submenu, {
   foreignKey: "menu_id_fk",
@@ -167,6 +171,31 @@ EnrollSubjectSubject.belongsTo(Subject, { foreignKey: "subject_id" });
 EnrollSubjectSubject.belongsTo(EnrollSubject, { foreignKey: "enroll_subject_id" });
 EnrollSubjectSubject.belongsTo(EnrollSubject, { foreignKey: "enroll_subject_id" });
 
+FeesDiscounts.belongsToMany(StatusTypes, {
+  through: FeesDiscountsStatusTypes,
+  foreignKey: "fees_discount_id",
+  otherKey: "status_type_id",
+  as: "typeDetails"
+});
+
+StatusTypes.belongsToMany(FeesDiscounts, {
+  through: FeesDiscountsStatusTypes,
+  foreignKey: "status_type_id",
+  otherKey: "fees_discount_id"
+});
+
+FeesDiscounts.belongsToMany(FeesTypes, {
+  through: FeesCategoryFeesDiscount,
+  foreignKey: "fees_discount_id",
+  otherKey: "fees_category_id",
+  as: "feesTypes"
+});
+
+FeesTypes.belongsToMany(FeesDiscounts, {
+  through: FeesCategoryFeesDiscount,
+  foreignKey: "fees_category_id",
+  otherKey: "fees_discount_id"
+});
 
 module.exports = {
   Menu,
@@ -189,4 +218,8 @@ module.exports = {
   EnrollSubjectSubject,
   Student,        
   StudentList,
+  FeesDiscounts,
+  FeesDiscountsStatusTypes,
+  FeesTypes,
+  FeesCategoryFeesDiscount
 };
