@@ -206,24 +206,90 @@ module.exports.createEnrollCourse = async (req, res) => {
   }
 };
 
+// module.exports.updateEnrollCourse = async (req, res) => {
+//   const { enrollCourseId } = req.params;
+//   const { program_id, semester_id, section_id, status, subject_ids } = req.body;
+
+//   try {
+//     // Step 1: Find enroll_subject by ID
+//     const enrollSubject = await EnrollSubject.findByPk(enrollCourseId, {
+//       include: [
+//         {
+//           model: Subject,
+//           attributes: ["id", "title", "code"],
+//           through: {
+//             attributes: [
+//               "enroll_subject_id_pk",
+//               "enroll_subject_id",
+//               "subject_id",
+//             ],
+//           },
+//         },
+//       ],
+//     });
+
+//     if (!enrollSubject) {
+//       return res.status(404).json({ error: "Enroll course not found" });
+//     }
+
+//     // Step 2: Update main fields (only if provided, otherwise keep old values)
+//     await enrollSubject.update({
+//       program_id: program_id ?? enrollSubject.program_id,
+//       semester_id: semester_id ?? enrollSubject.semester_id,
+//       section_id: section_id ?? enrollSubject.section_id,
+//       status: status ?? enrollSubject.status,
+//     });
+
+//     // Step 3: Update subjects if array is provided
+//     if (Array.isArray(subject_ids)) {
+//       await enrollSubject.setSubjects(subject_ids);
+//     }
+
+//     // Step 4: Refetch updated record with associations
+//     const updatedEnrollSubject = await EnrollSubject.findByPk(enrollCourseId, {
+//       include: [
+//         {
+//           model: Subject,
+//           attributes: ["id", "title", "code"], // ✅ only pick the fields you want
+//           through: {
+//             attributes: [
+//               "enroll_subject_id_pk",
+//               "enroll_subject_id",
+//               "subject_id",
+//             ],
+//           }, // ✅ include join table
+//         },
+//       ],
+//     });
+
+//     return res.status(200).json({
+//       message: "Enroll course updated successfully",
+//       enrollSubject: updatedEnrollSubject,
+//     });
+//   } catch (error) {
+//     console.error(error);
+
+//     if (error.name === "SequelizeUniqueConstraintError") {
+//       return res.status(400).json({ error: "Duplicate entry not allowed" });
+//     }
+
+//     res.status(500).json({ error: "Something went wrong" });
+//   }
+// };
+
+
 module.exports.updateEnrollCourse = async (req, res) => {
   const { enrollCourseId } = req.params;
-  const { program_id, semester_id, section_id, status, subject_ids } = req.body;
+  const { status, subject_ids } = req.body;
 
   try {
-    // Step 1: Find enroll_subject by ID
+    // 1️⃣ Find enroll_subject by ID
     const enrollSubject = await EnrollSubject.findByPk(enrollCourseId, {
       include: [
         {
           model: Subject,
           attributes: ["id", "title", "code"],
-          through: {
-            attributes: [
-              "enroll_subject_id_pk",
-              "enroll_subject_id",
-              "subject_id",
-            ],
-          },
+          through: { attributes: ["enroll_subject_id_pk", "enroll_subject_id", "subject_id"] },
         },
       ],
     });
@@ -232,32 +298,24 @@ module.exports.updateEnrollCourse = async (req, res) => {
       return res.status(404).json({ error: "Enroll course not found" });
     }
 
-    // Step 2: Update main fields (only if provided, otherwise keep old values)
-    await enrollSubject.update({
-      program_id: program_id ?? enrollSubject.program_id,
-      semester_id: semester_id ?? enrollSubject.semester_id,
-      section_id: section_id ?? enrollSubject.section_id,
-      status: status ?? enrollSubject.status,
-    });
+    // 2️⃣ Update only status (if provided)
+    if (typeof status !== "undefined") {
+      enrollSubject.status = status;
+      await enrollSubject.save();
+    }
 
-    // Step 3: Update subjects if array is provided
+    // 3️⃣ Update subjects (if array is provided → full replace)
     if (Array.isArray(subject_ids)) {
       await enrollSubject.setSubjects(subject_ids);
     }
 
-    // Step 4: Refetch updated record with associations
+    // 4️⃣ Refetch updated record with associations
     const updatedEnrollSubject = await EnrollSubject.findByPk(enrollCourseId, {
       include: [
         {
           model: Subject,
-          attributes: ["id", "title", "code"], // ✅ only pick the fields you want
-          through: {
-            attributes: [
-              "enroll_subject_id_pk",
-              "enroll_subject_id",
-              "subject_id",
-            ],
-          }, // ✅ include join table
+          attributes: ["id", "title", "code"],
+          through: { attributes: ["enroll_subject_id_pk", "enroll_subject_id", "subject_id"] },
         },
       ],
     });
@@ -268,12 +326,7 @@ module.exports.updateEnrollCourse = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-
-    if (error.name === "SequelizeUniqueConstraintError") {
-      return res.status(400).json({ error: "Duplicate entry not allowed" });
-    }
-
-    res.status(500).json({ error: "Something went wrong" });
+    res.status(500).json({ error: "Something went wrong while updating Enroll Course" });
   }
 };
 
