@@ -22,6 +22,10 @@ const FeesDiscounts = require("./fees/feesDiscount/FeesDiscounts.js");
 const FeesDiscountsStatusTypes = require("./fees/feesDiscount/feesDiscountStatusTypes.js");
 const FeesTypes = require("./fees/FeesTypes.js");
 const FeesCategoryFeesDiscount = require("./fees/feesDiscount/FeesCategoryFeesDiscount.js");
+const User = require("./auth/User.js");
+const Role = require("./auth/Role.js");
+const UserRole = require("./auth/UserRole.js");
+const UserSession = require("./auth/UserSession.js");
 // Association
 Menu.hasMany(Submenu, {
   foreignKey: "menu_id_fk",
@@ -86,8 +90,6 @@ ProgramSubject.belongsTo(Subject, { foreignKey: "subject_id" });
 Program.hasMany(ProgramSubject, { foreignKey: "program_id" });
 Subject.hasMany(ProgramSubject, { foreignKey: "subject_id" });
 
-
-
 // Many-to-many between Semester and Section via ProgramSemesterSection
 Semester.belongsToMany(Section, {
   through: ProgramSemesterSection,
@@ -148,7 +150,6 @@ EnrollSubject.belongsTo(Semester, {
 });
 Semester.hasMany(EnrollSubject, { foreignKey: "semester_id" });
 
-
 EnrollSubject.belongsTo(Section, { foreignKey: "section_id", as: "section" });
 // EnrollSubject.belongsTo(Subject, { foreignKey: "subject_id", as: "subject" });
 
@@ -158,44 +159,67 @@ EnrollSubject.belongsTo(Section, { foreignKey: "section_id", as: "section" });
 EnrollSubject.belongsToMany(Subject, {
   through: EnrollSubjectSubject,
   foreignKey: "enroll_subject_id",
-  otherKey:"subject_id"
+  otherKey: "subject_id",
 });
 Subject.belongsToMany(EnrollSubject, {
   through: EnrollSubjectSubject,
   foreignKey: "subject_id",
-  otherKey:"enroll_subject_id"
+  otherKey: "enroll_subject_id",
 });
 
 // Optional: direct belongsTo if you want easy access to the subject from the join
 EnrollSubjectSubject.belongsTo(Subject, { foreignKey: "subject_id" });
-EnrollSubjectSubject.belongsTo(EnrollSubject, { foreignKey: "enroll_subject_id" });
-EnrollSubjectSubject.belongsTo(EnrollSubject, { foreignKey: "enroll_subject_id" });
+EnrollSubjectSubject.belongsTo(EnrollSubject, {
+  foreignKey: "enroll_subject_id",
+});
+EnrollSubjectSubject.belongsTo(EnrollSubject, {
+  foreignKey: "enroll_subject_id",
+});
 
 FeesDiscounts.belongsToMany(StatusTypes, {
   through: FeesDiscountsStatusTypes,
   foreignKey: "fees_discount_id",
   otherKey: "status_type_id",
-  as: "typeDetails"
+  as: "typeDetails",
 });
 
 StatusTypes.belongsToMany(FeesDiscounts, {
   through: FeesDiscountsStatusTypes,
   foreignKey: "status_type_id",
-  otherKey: "fees_discount_id"
+  otherKey: "fees_discount_id",
 });
 
 FeesDiscounts.belongsToMany(FeesTypes, {
   through: FeesCategoryFeesDiscount,
   foreignKey: "fees_discount_id",
   otherKey: "fees_category_id",
-  as: "feesTypes"
+  as: "feesTypes",
 });
 
 FeesTypes.belongsToMany(FeesDiscounts, {
   through: FeesCategoryFeesDiscount,
   foreignKey: "fees_category_id",
-  otherKey: "fees_discount_id"
+  otherKey: "fees_discount_id",
 });
+
+// User ↔ Role (many-to-many via UserRole)
+User.belongsToMany(Role, {
+  through: UserRole,
+  foreignKey: "user_id_fk",
+  otherKey: "role_id_fk",
+});
+Role.belongsToMany(User, {
+  through: UserRole,
+  foreignKey: "role_id_fk",
+  otherKey: "user_id_fk",
+});
+
+
+UserRole.belongsTo(User,{foreignKey: "user_id_fk"})
+UserRole.belongsTo(Role,{foreignKey: "role_id_fk"})
+
+User.hasMany(UserRole, { foreignKey: "user_id_fk" });
+Role.hasMany(UserRole, { foreignKey: "role_id_fk" });
 
 module.exports = {
   Menu,
@@ -216,10 +240,14 @@ module.exports = {
   ProgramSubject,
   EnrollSubject,
   EnrollSubjectSubject,
-  Student,        
+  Student,
   StudentList,
   FeesDiscounts,
   FeesDiscountsStatusTypes,
   FeesTypes,
-  FeesCategoryFeesDiscount
+  FeesCategoryFeesDiscount,
+  User,
+  Role,
+  UserRole,
+  UserSession
 };

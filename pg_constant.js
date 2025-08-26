@@ -19,17 +19,46 @@
 
 // module.exports = { pgPool };
 
+// require("dotenv").config();
+// const { Sequelize } = require("sequelize");
+
+// const sequelize = new Sequelize(
+//   process.env.PG_DATABASE,
+//   process.env.PG_USER,
+//   process.env.PG_PASSWORD,
+//   {
+//     host: process.env.PG_HOST,
+//     dialect: "postgres",
+//   }
+// );
+
+// module.exports = sequelize;
+
 require("dotenv").config();
 const { Sequelize } = require("sequelize");
+const { Pool } = require("pg");
 
+// Sequelize ORM instance
 const sequelize = new Sequelize(
   process.env.PG_DATABASE,
   process.env.PG_USER,
   process.env.PG_PASSWORD,
   {
     host: process.env.PG_HOST,
+    port: process.env.PG_PORT,
     dialect: "postgres",
+    logging: false,
   }
 );
 
-module.exports = sequelize;
+// pg Pool (needed by connect-pg-simple)
+const pgPool = new Pool({
+  host: process.env.PG_HOST,
+  port: process.env.PG_PORT,
+  user: process.env.PG_USER,
+  password: process.env.PG_PASSWORD,
+  database: process.env.PG_DATABASE,
+});
+
+module.exports = { sequelize, pgPool };
+

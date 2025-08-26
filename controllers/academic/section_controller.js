@@ -5,7 +5,7 @@ const {
   Semester,
   ProgramSemesterSection,
 } = require("../../models");
-const sequelize = require("../../pg_constant");
+const {sequelize} = require("../../pg_constant");
 const { Op } = require("sequelize");
 
 module.exports = {

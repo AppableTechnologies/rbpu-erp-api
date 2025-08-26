@@ -36,7 +36,6 @@
 
 const express = require("express");
 const router = express.Router();
-const careerCandidateRouter = require("./user_router");
 const menusRouter = require("./common/menus_router");
 const facultiesRouter = require("./academic/faculties_router");
 const programsRouter = require("./academic/programs_router");
@@ -54,7 +53,8 @@ const SubjectRouter = require("./academic/subject_routes");
 const EnrollSubjectRouter = require("./academic/enroll_subject_router");
 // const studentListRouter = require("./admission/student_list/student_list_router")
 const FeesDiscounts = require("./fees/feesDiscount_router");
-router.use("/api/users", careerCandidateRouter);
+const userRouter = require("./user_router");
+router.use("/api/users", userRouter);
 router.use("/api/menus", menusRouter);
 router.use("/api/faculties",facultiesRouter);
 router.use("/api/programs",programsRouter);

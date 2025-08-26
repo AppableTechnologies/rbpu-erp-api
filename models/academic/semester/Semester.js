@@ -1,5 +1,5 @@
 const {DataTypes} = require('sequelize');
-const sequelize = require('../../../pg_constant');
+const {sequelize} = require('../../../pg_constant');
 
 const Semester = sequelize.define('Semester', {
     id: {

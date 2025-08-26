@@ -1,0 +1,130 @@
+// models/auth/User.js
+const { DataTypes } = require("sequelize");
+const {sequelize} = require("../../pg_constant"); // adjust path to your Sequelize instance
+
+const User = sequelize.define(
+  "User",
+  {
+    user_id_pk: {
+      type: DataTypes.BIGINT,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    staff_id: {
+      type: DataTypes.STRING(191),
+      allowNull: false,
+    },
+    department_id: DataTypes.INTEGER,
+    designation_id: DataTypes.INTEGER,
+    first_name: {
+      type: DataTypes.STRING(191),
+      allowNull: false,
+    },
+    last_name: {
+      type: DataTypes.STRING(191),
+      allowNull: false,
+    },
+    father_name: DataTypes.STRING(191),
+    mother_name: DataTypes.STRING(191),
+    email: {
+      type: DataTypes.CHAR(191),
+      allowNull: false,
+      unique: true,
+      validate: { isEmail: true },
+    },
+    email_verified_at: DataTypes.DATE,
+    password: {
+      type: DataTypes.CHAR(191),
+      allowNull: false,
+    },
+    password_text: DataTypes.TEXT,
+    gender: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    dob: {
+      type: DataTypes.DATEONLY,
+      allowNull: false,
+    },
+    joining_date: DataTypes.DATEONLY,
+    ending_date: DataTypes.DATEONLY,
+    phone: DataTypes.STRING(191),
+    emergency_phone: DataTypes.STRING(191),
+    mother_tongue: DataTypes.STRING(191),
+    marital_status: DataTypes.INTEGER,
+    blood_group: DataTypes.INTEGER,
+    nationality: DataTypes.STRING(191),
+    national_id: DataTypes.STRING(191),
+    passport_no: DataTypes.STRING(191),
+    present_province: DataTypes.INTEGER,
+    present_district: DataTypes.INTEGER,
+    present_village: DataTypes.TEXT,
+    present_address: DataTypes.TEXT,
+    permanent_province: DataTypes.INTEGER,
+    permanent_district: DataTypes.INTEGER,
+    permanent_village: DataTypes.TEXT,
+    permanent_address: DataTypes.TEXT,
+    education_level: DataTypes.STRING(191),
+    graduation_academy: DataTypes.STRING(191),
+    year_of_graduation: DataTypes.STRING(191),
+    graduation_field: DataTypes.STRING(191),
+    experience: DataTypes.TEXT,
+    note: DataTypes.TEXT,
+    basic_salary: {
+      type: DataTypes.DOUBLE,
+      allowNull: false,
+      defaultValue: 0.0,
+    },
+    contract_type: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 1,
+    },
+    work_shift: DataTypes.INTEGER,
+    salary_type: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 1,
+    },
+    bank_account_name: DataTypes.STRING(191),
+    bank_account_no: DataTypes.STRING(191),
+    bank_name: DataTypes.STRING(191),
+    ifsc_code: DataTypes.STRING(191),
+    bank_branch: DataTypes.STRING(191),
+    tin_no: DataTypes.STRING(191),
+    photo: DataTypes.TEXT,
+    signature: DataTypes.TEXT,
+    resume: DataTypes.TEXT,
+    joining_letter: DataTypes.TEXT,
+    is_admin: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
+    login: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: true,
+    },
+    status: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 1,
+    },
+    remember_token: DataTypes.STRING(100),
+    created_by: DataTypes.BIGINT,
+    updated_by: DataTypes.BIGINT,
+    religion: DataTypes.STRING(191),
+    caste: DataTypes.STRING(191),
+    country: DataTypes.STRING(191),
+    epf_no: DataTypes.TEXT,
+  },
+  {
+    tableName: "users",
+    timestamps: true,
+    createdAt: "created_at",
+    updatedAt: "updated_at",
+  }
+);
+
+module.exports = User;

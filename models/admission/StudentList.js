@@ -1,5 +1,5 @@
 const { DataTypes } = require("sequelize");
-const sequelize = require("../../pg_constant");
+const {sequelize} = require("../../pg_constant");
 const Student = require("./Students.js");
 const Faculty = require("../academic/Faculty");
 const Program = require("../academic/Program");
