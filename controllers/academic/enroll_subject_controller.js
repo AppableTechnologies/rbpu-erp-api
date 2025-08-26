@@ -6,6 +6,7 @@ const {
   Semester,
   Section,
   EnrollSubjectSubject,
+  ProgramSubject,
 } = require("../../models");
 
 module.exports.getEnrollCourses = async (req, res) => {
@@ -111,81 +112,184 @@ module.exports.getEnrollCourseById = async (req, res) => {
 };
 
 module.exports.createEnrollCourse = async (req, res) => {
-  const {
-    program_id,
-    semester_id,
-    section_id,
-    status = true,
-    subject_ids,
-  } = req.body;
-
-  if (
-    !program_id ||
-    !semester_id ||
-    !section_id ||
-    !Array.isArray(subject_ids)
-  ) {
-    return res.status(400).json({ error: "All fields are required" });
-  }
+  const { program_id, semester_id, section_id, subject_ids } = req.body;
 
   try {
-    // Step 1: Check if already exists
-    const existing = await EnrollSubject.findOne({
+    // 1. Create or find EnrollSubject (one per program/semester/section)
+    let enrollSubject = await EnrollSubject.findOne({
       where: { program_id, semester_id, section_id },
+      include: [{ model: Subject }],
     });
 
-    if (existing) {
-      return res
-        .status(400)
-        .json({ error: "This course is already enrolled." });
+    if (!enrollSubject) {
+      enrollSubject = await EnrollSubject.create({
+        program_id,
+        semester_id,
+        section_id,
+        status: true,
+      });
     }
 
-    // Step 2: Create enroll_subject record
-    const enrollSubject = await EnrollSubject.create({
-      program_id,
-      semester_id,
-      section_id,
-      status,
-    });
+    // 2. Get already enrolled subject IDs
+    const existingSubjectIds =
+      enrollSubject.Subjects?.map((s) => parseInt(s.id)) || [];
 
-    // Step 3: Attach subjects
-    await enrollSubject.addSubjects(subject_ids);
+    // 3. Filter new vs skipped
+    const newSubjectIds = subject_ids.filter(
+      (id) => !existingSubjectIds.includes(id)
+    );
+    const skippedSubjects = subject_ids.filter((id) =>
+      existingSubjectIds.includes(id)
+    );
 
-    res.status(201).json({
-      message: "Enroll course created successfully",
-      enrollSubject,
+    // 4. Insert new ones
+    if (newSubjectIds.length > 0) {
+      await EnrollSubjectSubject.bulkCreate(
+        newSubjectIds.map((sid) => ({
+          enroll_subject_id: enrollSubject.id,
+          subject_id: sid,
+        }))
+      );
+    }
+
+    // 5. Fetch skipped subject details for message
+    let skippedSubjectDetails = [];
+    if (skippedSubjects.length > 0) {
+      skippedSubjectDetails = await Subject.findAll({
+        where: { id: skippedSubjects },
+        attributes: ["id", "title", "code"],
+      });
+    }
+    let newSubjectDetails = [];
+    if (newSubjectIds.length > 0) {
+      newSubjectDetails = await Subject.findAll({
+        where: { id: newSubjectIds },
+        attributes: ["id", "title", "code"],
+      });
+    }
+
+    // 6. Reload enrollSubject with updated subjects
+    const updatedEnrollSubject = await EnrollSubject.findByPk(
+      enrollSubject.id,
+      {
+        include: [{ model: Subject }],
+      }
+    );
+
+    const skippedSubjectsTitle =
+      skippedSubjectDetails.length > 0 &&
+      skippedSubjectDetails.map((s) => s.title);
+
+    const newSubjectsTitle =
+      newSubjectDetails.length > 0 && newSubjectDetails.map((s) => s.title);
+
+    return res.status(200).json({
+      message: [
+        newSubjectsTitle
+          ? `${newSubjectsTitle} were added successfully.`
+          : "No new subjects were added.",
+        skippedSubjectsTitle
+          ? ` Already enrolled subjects: ${skippedSubjectsTitle} were skipped!`
+          : "",
+      ]
+        .filter(Boolean)
+        .join(" "),
+      addedSubjects: newSubjectDetails,
+      skippedSubjects: skippedSubjectDetails,
+      enrollSubject: updatedEnrollSubject,
     });
   } catch (error) {
     console.error(error);
-
-    if (error.name === "SequelizeUniqueConstraintError") {
-      return res.status(400).json({ error: "Duplicate entry not allowed" });
-    }
-
-    res.status(500).json({ error: "Something went wrong" });
+    return res.status(500).json({
+      error: "Something went wrong while creating EnrollSubject",
+    });
   }
 };
 
-// controllers/enrollCourseController.js
+// module.exports.updateEnrollCourse = async (req, res) => {
+//   const { enrollCourseId } = req.params;
+//   const { program_id, semester_id, section_id, status, subject_ids } = req.body;
+
+//   try {
+//     // Step 1: Find enroll_subject by ID
+//     const enrollSubject = await EnrollSubject.findByPk(enrollCourseId, {
+//       include: [
+//         {
+//           model: Subject,
+//           attributes: ["id", "title", "code"],
+//           through: {
+//             attributes: [
+//               "enroll_subject_id_pk",
+//               "enroll_subject_id",
+//               "subject_id",
+//             ],
+//           },
+//         },
+//       ],
+//     });
+
+//     if (!enrollSubject) {
+//       return res.status(404).json({ error: "Enroll course not found" });
+//     }
+
+//     // Step 2: Update main fields (only if provided, otherwise keep old values)
+//     await enrollSubject.update({
+//       program_id: program_id ?? enrollSubject.program_id,
+//       semester_id: semester_id ?? enrollSubject.semester_id,
+//       section_id: section_id ?? enrollSubject.section_id,
+//       status: status ?? enrollSubject.status,
+//     });
+
+//     // Step 3: Update subjects if array is provided
+//     if (Array.isArray(subject_ids)) {
+//       await enrollSubject.setSubjects(subject_ids);
+//     }
+
+//     // Step 4: Refetch updated record with associations
+//     const updatedEnrollSubject = await EnrollSubject.findByPk(enrollCourseId, {
+//       include: [
+//         {
+//           model: Subject,
+//           attributes: ["id", "title", "code"], // ✅ only pick the fields you want
+//           through: {
+//             attributes: [
+//               "enroll_subject_id_pk",
+//               "enroll_subject_id",
+//               "subject_id",
+//             ],
+//           }, // ✅ include join table
+//         },
+//       ],
+//     });
+
+//     return res.status(200).json({
+//       message: "Enroll course updated successfully",
+//       enrollSubject: updatedEnrollSubject,
+//     });
+//   } catch (error) {
+//     console.error(error);
+
+//     if (error.name === "SequelizeUniqueConstraintError") {
+//       return res.status(400).json({ error: "Duplicate entry not allowed" });
+//     }
+
+//     res.status(500).json({ error: "Something went wrong" });
+//   }
+// };
+
 
 module.exports.updateEnrollCourse = async (req, res) => {
   const { enrollCourseId } = req.params;
-  const { program_id, semester_id, section_id, status, subject_ids } = req.body;
+  const { status, subject_ids } = req.body;
 
   try {
-    // Step 1: Find enroll_subject by ID
+    // 1️⃣ Find enroll_subject by ID
     const enrollSubject = await EnrollSubject.findByPk(enrollCourseId, {
       include: [
         {
           model: Subject,
           attributes: ["id", "title", "code"],
-          through: {
-            attributes: [
-              "enroll_subject_id_pk",
-              "enroll_subject_id",
-              "subject_id",
-            ],
-          },
+          through: { attributes: ["enroll_subject_id_pk", "enroll_subject_id", "subject_id"] },
         },
       ],
     });
@@ -194,32 +298,24 @@ module.exports.updateEnrollCourse = async (req, res) => {
       return res.status(404).json({ error: "Enroll course not found" });
     }
 
-    // Step 2: Update main fields (only if provided, otherwise keep old values)
-    await enrollSubject.update({
-      program_id: program_id ?? enrollSubject.program_id,
-      semester_id: semester_id ?? enrollSubject.semester_id,
-      section_id: section_id ?? enrollSubject.section_id,
-      status: status ?? enrollSubject.status,
-    });
+    // 2️⃣ Update only status (if provided)
+    if (typeof status !== "undefined") {
+      enrollSubject.status = status;
+      await enrollSubject.save();
+    }
 
-    // Step 3: Update subjects if array is provided
+    // 3️⃣ Update subjects (if array is provided → full replace)
     if (Array.isArray(subject_ids)) {
       await enrollSubject.setSubjects(subject_ids);
     }
 
-    // Step 4: Refetch updated record with associations
+    // 4️⃣ Refetch updated record with associations
     const updatedEnrollSubject = await EnrollSubject.findByPk(enrollCourseId, {
       include: [
         {
           model: Subject,
-          attributes: ["id", "title", "code"], // ✅ only pick the fields you want
-          through: {
-            attributes: [
-              "enroll_subject_id_pk",
-              "enroll_subject_id",
-              "subject_id",
-            ],
-          }, // ✅ include join table
+          attributes: ["id", "title", "code"],
+          through: { attributes: ["enroll_subject_id_pk", "enroll_subject_id", "subject_id"] },
         },
       ],
     });
@@ -230,12 +326,7 @@ module.exports.updateEnrollCourse = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-
-    if (error.name === "SequelizeUniqueConstraintError") {
-      return res.status(400).json({ error: "Duplicate entry not allowed" });
-    }
-
-    res.status(500).json({ error: "Something went wrong" });
+    res.status(500).json({ error: "Something went wrong while updating Enroll Course" });
   }
 };
 
@@ -265,39 +356,70 @@ module.exports.deleteEnrollCourse = async (req, res) => {
   // GET /api/programs?faculty_id=1
 };
 
+// module.exports.getSubjectsVia_Prog_Sem_Section = async (req, res) => {
+//   const { program_id, semester_id, section_id } = req.query;
+
+//   try {
+//     if (!program_id || !semester_id || !section_id) {
+//       return res.status(400).json({ error: "Missing required parameters" });
+//     }
+
+//     const enrollSubject = await EnrollSubject.findOne({
+//       where: { program_id, semester_id, section_id },
+//       include: [
+//         {
+//           model: Subject,
+//           attributes: ["id", "title", "code"],
+//           through: {
+//             attributes: [
+//               // "enroll_subject_id_pk",
+//               // "enroll_subject_id",
+//               // "subject_id",
+//             ],
+//           },
+//         },
+//       ],
+//     });
+
+//     if (!enrollSubject) {
+//       return res.status(204).json({ error: "Enroll course not found" });
+//     }
+//     return res.status(200).json(enrollSubject.Subjects);
+//   } catch (error) {
+//     console.error(error);
+//     return res.status(500).json({
+//       error: "Something went  wrong inside getSubjectsVia_Prog_Sem_Section",
+//     });
+//   }
+// };
+
 module.exports.getSubjectsVia_Prog_Sem_Section = async (req, res) => {
-  const { program_id, semester_id, section_id } = req.query;
+  const { program_id } = req.query;
 
   try {
-    if (!program_id || !semester_id || !section_id) {
-      return res.status(400).json({ error: "Missing required parameters" });
+    if (!program_id) {
+      return res
+        .status(400)
+        .json({ error: "Missing required parameter: program_id" });
     }
 
-    const enrollSubject = await EnrollSubject.findOne({
-      where: { program_id, semester_id, section_id },
+    const subjects = await ProgramSubject.findAll({
+      where: { program_id },
       include: [
         {
           model: Subject,
           attributes: ["id", "title", "code"],
-          through: {
-            attributes: [
-              // "enroll_subject_id_pk",
-              // "enroll_subject_id",
-              // "subject_id",
-            ],
-          },
         },
       ],
     });
 
-    if (!enrollSubject) {
-      return res.status(204).json({ error: "Enroll course not found" });
-    }
-    return res.status(200).json(enrollSubject.Subjects);
+    return res.status(200).json(subjects.map((s) => s.Subject));
+
+    // return res.status(200).json(program.Subjects); // all subjects for this program
   } catch (error) {
     console.error(error);
     return res.status(500).json({
-      error: "Something went  wrong inside getSubjectsVia_Prog_Sem_Section",
+      error: "Something went wrong inside getSubjectsVia_Prog_Sem_Section",
     });
   }
 };
