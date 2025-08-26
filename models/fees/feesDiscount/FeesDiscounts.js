@@ -28,10 +28,6 @@ const FeesDiscounts = sequelize.define(
     type:{
         type:DataTypes.INTEGER,
         allowNull:false,
-        references:{
-            model:"status_types",
-            key:"id",
-        }
     },
     status: {
       type: DataTypes.BOOLEAN,
