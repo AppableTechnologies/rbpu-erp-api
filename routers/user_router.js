@@ -4,5 +4,5 @@ const { userLogin } = require('../controllers/user_controller')
 
 // // userRouter.route("/login").post(userLogin);
 
-userRouter.get("/login", userLogin);
+userRouter.post("/login", userLogin);
 module.exports = userRouter;

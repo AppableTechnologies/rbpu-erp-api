@@ -101,7 +101,7 @@ const cookieParser = require("cookie-parser");
 const pgSession = require("connect-pg-simple")(session);
 const { pgPool } = require("./pg_constant.js");
 const cors = require("cors"); 
-const sequelize = require("./pg_constant.js"); // Sequelize instance
+const {sequelize} = require("./pg_constant.js"); // Sequelize instance
 
 // Middleware
 app.use(express.json({ limit: "50mb" }));

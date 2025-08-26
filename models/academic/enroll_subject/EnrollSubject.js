@@ -1,4 +1,4 @@
-const sequelize = require("../../../pg_constant");
+const {sequelize} = require("../../../pg_constant");
 const { DataTypes } = require("sequelize");
 
 const EnrollSubject = sequelize.define(

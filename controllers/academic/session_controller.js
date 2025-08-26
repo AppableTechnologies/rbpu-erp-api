@@ -1,6 +1,6 @@
 const { Op } = require("sequelize");
 const { Session, Program, ProgramSession } = require("../../models");
-const sequelize = require("../../pg_constant");
+const {sequelize} = require("../../pg_constant");
 const { pgPool } = require("../../pg_constant");
 const logger = require("../../utils/logger");
 
