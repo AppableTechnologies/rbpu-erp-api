@@ -45,15 +45,15 @@ const batchesRouter = require("./academic/batches_router");
 const studentsRouter = require("./admission/student_registration_routers");
 const sessionRouter = require("./academic/session_router");
 const dropdownRouter = require("./common/dropdown_router");
-const  SemesterRouter  = require("./academic/Semesters_routes");
+const SemesterRouter  = require("./academic/Semesters_routes");
 const SectionRouter = require("./academic/section_router");
 const studentlistRouter = require('./admission/student_list/index_router')
 const FeesTypesRouter = require("./fees/feestypes_router");
 const SubjectRouter = require("./academic/subject_routes");
 const EnrollSubjectRouter = require("./academic/enroll_subject_router");
-// const studentListRouter = require("./admission/student_list/student_list_router")
 const FeesDiscounts = require("./fees/feesDiscount_router");
 const userRouter = require("./user_router");
+
 router.use("/api/users", userRouter);
 router.use("/api/menus", menusRouter);
 router.use("/api/faculties",facultiesRouter);
@@ -71,5 +71,5 @@ router.use("/api/feestypes", FeesTypesRouter);
 router.use("/api/subjects", SubjectRouter);
 router.use("/api/enroll-subjects", EnrollSubjectRouter);
 router.use("/api/fees-discounts",FeesDiscounts);
-// router.use("/api/students", studentListRouter);
+
 module.exports = router;
