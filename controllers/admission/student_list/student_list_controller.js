@@ -87,6 +87,9 @@
 //   },
 // };
 
+//  
+
+// controllers/admission/student_list/student_list_controller.js
 const { Op } = require("sequelize");
 const { Student, Faculty, Program, Session, Semester, Section } = require("../../../models");
 
@@ -117,16 +120,29 @@ module.exports = {
       if (section_id) where.section_id = section_id;
       if (status) where.status = status;
 
+      // Server-side search across student_id, first_name, last_name, and joined titles
       if (search) {
+        const q = search.toLowerCase();
         where[Op.or] = [
-          { student_id: { [Op.iLike]: `%${search}%` } },
-          { first_name: { [Op.iLike]: `%${search}%` } },
-          { last_name: { [Op.iLike]: `%${search}%` } },
+          { student_id: { [Op.iLike]: `%${q}%` } },
+          { first_name: { [Op.iLike]: `%${q}%` } },
+          { last_name: { [Op.iLike]: `%${q}%` } },
         ];
       }
 
       const { count, rows } = await Student.findAndCountAll({
         where,
+        attributes: [
+          "id",
+          "student_id",
+          [Student.sequelize.literal(`concat("first_name",' ','last_name')`), "name"],
+          "faculty_id",
+          "program_id",
+          "session_id",
+          "semester_id",
+          "section_id",
+          "status",
+        ],
         include: [
           { model: Faculty, attributes: ["id", "title"] },
           { model: Program, attributes: ["id", "title"] },
@@ -139,8 +155,26 @@ module.exports = {
         order: [["id", "ASC"]],
       });
 
+      // Map response to include frontend keys
+      const data = rows.map((s) => ({
+        id: s.id,
+        student_id: s.student_id,
+        name: s.getDataValue("name"),
+        faculty_id: s.faculty_id,
+        faculty_title: s.Faculty?.title,
+        program_id: s.program_id,
+        program_title: s.Program?.title,
+        session_id: s.session_id,
+        session_title: s.Session?.title,
+        semester_id: s.semester_id,
+        semester_title: s.Semester?.title,
+        section_id: s.section_id,
+        section_title: s.Section?.title,
+        status: s.status,
+      }));
+
       return res.status(200).json({
-        data: rows,
+        data,
         pagination: {
           totalItems: count,
           totalPages: Math.ceil(count / limit),
@@ -154,12 +188,22 @@ module.exports = {
     }
   },
 
-  // GET /api/students_list/:id
   getStudentById: async (req, res) => {
     try {
       const { id } = req.params;
       const student = await Student.findOne({
         where: { student_id: id },
+        attributes: [
+          "id",
+          "student_id",
+          [Student.sequelize.literal(`concat("first_name",' ','last_name')`), "name"],
+          "faculty_id",
+          "program_id",
+          "session_id",
+          "semester_id",
+          "section_id",
+          "status",
+        ],
         include: [
           { model: Faculty, attributes: ["id", "title"] },
           { model: Program, attributes: ["id", "title"] },
@@ -169,11 +213,24 @@ module.exports = {
         ],
       });
 
-      if (!student) {
-        return res.status(404).json({ error: "Student not found" });
-      }
+      if (!student) return res.status(404).json({ error: "Student not found" });
 
-      return res.status(200).json(student);
+      return res.status(200).json({
+        id: student.id,
+        student_id: student.student_id,
+        name: student.getDataValue("name"),
+        faculty_id: student.faculty_id,
+        faculty_title: student.Faculty?.title,
+        program_id: student.program_id,
+        program_title: student.Program?.title,
+        session_id: student.session_id,
+        session_title: student.Session?.title,
+        semester_id: student.semester_id,
+        semester_title: student.Semester?.title,
+        section_id: student.section_id,
+        section_title: student.Section?.title,
+        status: student.status,
+      });
     } catch (err) {
       console.error("Error fetching student by ID:", err);
       return res.status(500).json({ error: "Failed to fetch student" });
