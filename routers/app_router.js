@@ -52,6 +52,7 @@ const FeesTypesRouter = require("./fees/feestypes_router");
 const SubjectRouter = require("./academic/subject_routes");
 const EnrollSubjectRouter = require("./academic/enroll_subject_router");
 // const studentListRouter = require("./admission/student_list/student_list_router")
+// routerss 
 const FeesDiscounts = require("./fees/feesDiscount_router");
 const userRouter = require("./user_router");
 router.use("/api/users", userRouter);
