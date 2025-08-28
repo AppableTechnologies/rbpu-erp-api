@@ -1,5 +1,5 @@
 const { Program, Session } = require("../../../models");
-
+// getsessions via program id
 const getSessionsViaProgramId = async (req, res) => {
   const { program_id } = req.query;
   try {
