@@ -176,7 +176,7 @@ const Student = sequelize.define('Student', {
     type: DataTypes.TEXT,
   },
   country: {
-    type: DataTypes.STRING(191),
+    type: DataTypes.CHAR(191),
   },
   religion: {
     type: DataTypes.STRING(191),
