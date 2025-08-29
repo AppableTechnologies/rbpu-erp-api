@@ -1,11 +1,12 @@
 const logger = require("../../utils/logger");
-const { pgPool } = require("../../pg_constant");
+const { pgPool, sequelize } = require("../../pg_constant");
 
 const path = require("path");
 const fs = require("fs");
 const { uploadDir } = require("../../middlewares/multer"); // adjust path
 const { Op } = require("sequelize");
 const Student = require("../../models/admission/Students");
+const { StudentList } = require("../../models");
 
 const getStudents = async (req, res) => {
   const page = parseInt(req.query.page) || 1;
@@ -58,14 +59,19 @@ const getStudents = async (req, res) => {
 
 //made changes in quer formation of student registration
 const createStudent = async (req, res) => {
+   const t = await sequelize.transaction();
   try {
     logger.log("info", "inside createStudent Controller");
 
     const {
       student_id,
-      registration_no,
-      batch_id,
+      faculty_id,
       program_id,
+      session_id,
+      semester_id,
+      section_id,
+      batch_id,
+      registration_no,
       admission_date,
       first_name,
       last_name,
@@ -125,22 +131,22 @@ const createStudent = async (req, res) => {
     // Check if student already exists
     const existingStudent = await Student.findAll({
       where: {
-        [Op.or]: [
-          { student_id: student_id },
-          { registration_no: registration_no },
-        ],
+        [Op.or]: [{ student_id }, { registration_no }],
       },
     });
     if (existingStudent.length > 0) {
-      return res
-        .status(400)
-        .json({
-          message: "Student with this id or registration no. is already exists",
-        });
+      return res.status(400).json({
+        message: "Student with this id or registration no. is already exists",
+      });
     }
 
     const newStudent = await Student.create({
       student_id: student_id,
+      // faculty_id: faculty_id,
+      // session_id: session_id,
+      // semester_id: semester_id,
+      // section_id: section_id,
+
       registration_no: registration_no,
       batch_id: batch_id,
       program_id: program_id,
@@ -155,12 +161,12 @@ const createStudent = async (req, res) => {
       password_text: password_text,
       present_province: present_province,
       present_district: present_district,
-      present_village:present_village,
+      present_village: present_village,
       present_address: present_address,
       present_address: present_address,
       permanent_province: permanent_province,
       permanent_district: permanent_district,
-      permanent_village:permanent_village,
+      permanent_village: permanent_village,
       permanent_address: permanent_address,
       gender: gender,
       dob: dob,
@@ -170,7 +176,7 @@ const createStudent = async (req, res) => {
       marital_status: marital_status,
       blood_group: blood_group,
       nationality: nationality,
-      national_id:national_id,
+      national_id: national_id,
 
       passport_no: passport_no,
       school_name: school_name,
@@ -202,8 +208,28 @@ const createStudent = async (req, res) => {
       collage_certificate: collage_certificate,
       created_at: new Date(),
       updated_at: new Date(),
-    });
+    },
+    { transaction: t }
+  );
 
+
+    // 2. Create StudentList entry if student creation succeeded
+    await StudentList.create(
+      {
+        student_id: newStudent.id, // 🔹 PK of Student table
+        faculty_id,
+        program_id,
+        session_id,
+        semester_id,
+        section_id,
+        status_id: status, // 🔹 mapping your status → status_id
+      },
+      { transaction: t }
+    );
+
+
+
+    // 3. Handle file uploads (after student exists)
     const saveFile = (file, fieldName) => {
       if (!file) return null;
       const ext = path.extname(file.originalname);
@@ -221,11 +247,15 @@ const createStudent = async (req, res) => {
       await newStudent.update({
         ...(photo && { photo }),
         ...(signature && { signature }),
-      });
+      }, { transaction: t });
     }
+     // ✅ Commit both student + student_list
+    await t.commit();
 
-    res.status(201).json(newStudent);
+    // res.status(201).json(newStudent);
+      res.status(201).json({ message: "Student created successfully", newStudent });
   } catch (error) {
+     await t.rollback(); // ❌ Rollback if anything fails
     logger.error("Error creating student:", error);
     res.status(500).json({ error: "Failed to create student" });
   }
