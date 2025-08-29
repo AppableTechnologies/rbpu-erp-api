@@ -58,7 +58,8 @@ const EnrollSubjectRouter = require("./academic/enroll_subject_router");
 
 const FeesDiscounts = require("./fees/feesDiscount_router");
 const userRouter = require("./user_router");
-
+const FeesFinesRouter = require("./fees/feesFines_router");
+const IdCardsRouter = require("./admission/IdCards/IdCards_Router");
 router.use("/api/users", userRouter);
 router.use("/api/menus", menusRouter);
 router.use("/api/faculties",facultiesRouter);
@@ -76,5 +77,7 @@ router.use("/api/feestypes", FeesTypesRouter);
 router.use("/api/subjects", SubjectRouter);
 router.use("/api/enroll-subjects", EnrollSubjectRouter);
 router.use("/api/fees-discounts",FeesDiscounts);
-
+router.use("/api/fees-fines",FeesFinesRouter);
+router.use("/api/id-cards",IdCardsRouter);
+// router.use("/api/students", studentListRouter);
 module.exports = router;
