@@ -129,13 +129,23 @@ const createStudent = async (req, res) => {
     // Save uploaded files with custom name (student_id based)
 
     // Check if student already exists
-    const existingStudent = await Student.findAll({
-      where: {
-        [Op.or]: [{ student_id }, { registration_no }],
-      },
+    // const existingStudent = await Student.findAll({
+    //   where: {
+    //     [Op.or]: [{ student_id }, { registration_no }],
+    //   },
+    // });
+
+      // --- 1. Check existing student
+    const existingStudent = await Student.findOne({
+      where: { [Op.or]: [{ student_id }, { registration_no }] },
+      transaction: t,  // optional, but keeps it consistent
+      lock: t.LOCK.UPDATE
     });
-    if (existingStudent.length > 0) {
-      return res.status(400).json({
+
+
+    if (existingStudent) {
+       await t.rollback();
+      return res.status(409).json({
         message: "Student with this id or registration no. is already exists",
       });
     }
@@ -228,19 +238,18 @@ const createStudent = async (req, res) => {
     );
 
 
-
     // 3. Handle file uploads (after student exists)
-    const saveFile = (file, fieldName) => {
+    const saveFile = async (file, fieldName) => {
       if (!file) return null;
       const ext = path.extname(file.originalname);
       const filename = `${fieldName}-${student_id}-${Date.now()}${ext}`;
       const filePath = path.join(uploadDir, filename);
-      fs.writeFileSync(filePath, file.buffer);
+      await fs.promises.writeFile(filePath, file.buffer);
       return filename;
     };
 
-    const photo = saveFile(req.files?.photo?.[0], "photo");
-    const signature = saveFile(req.files?.signature?.[0], "signature");
+    const photo = await saveFile(req.files?.photo?.[0], "photo");
+    const signature = await saveFile(req.files?.signature?.[0], "signature");
 
     // Update the student with photo and signature filenames
     if (photo || signature) {
