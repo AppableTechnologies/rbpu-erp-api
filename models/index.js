@@ -26,6 +26,8 @@ const User = require("./auth/User.js");
 const Role = require("./auth/Role.js");
 const UserRole = require("./auth/UserRole.js");
 const UserSession = require("./auth/UserSession.js");
+const FeesFines = require("./fees/feesFines/FeesFines.js");
+const FeesCategoryFeesFines = require("./fees/feesFines/FeesCategoryFeesFines.js");
 // Association
 Menu.hasMany(Submenu, {
   foreignKey: "menu_id_fk",
@@ -221,6 +223,84 @@ UserRole.belongsTo(Role,{foreignKey: "role_id_fk"})
 User.hasMany(UserRole, { foreignKey: "user_id_fk" });
 Role.hasMany(UserRole, { foreignKey: "role_id_fk" });
 
+// Fees Fines Associations
+
+FeesFines.belongsToMany(FeesTypes, {
+  through: FeesCategoryFeesFines,
+  foreignKey: "fees_fine_id",
+  otherKey: "fees_category_id",
+  as: "feesTypes",
+});
+
+FeesTypes.belongsToMany(FeesFines, {
+  through: FeesCategoryFeesFines,
+  foreignKey: "fees_category_id",
+  otherKey: "fees_fine_id",
+});
+
+
+
+
+
+// ==================== STUDENT ASSOCIATIONS ====================
+
+// Student -> Faculty
+Student.belongsTo(Faculty, { 
+  foreignKey: "faculty_id", 
+  // as: "Faculty"
+});
+
+Faculty.hasMany(Student, { 
+  foreignKey: "faculty_id", 
+  // as: "students" 
+});
+
+// Student -> Program
+Student.belongsTo(Program, { 
+  foreignKey: "program_id", 
+  // as: "Program"
+});
+
+Program.hasMany(Student, { 
+  foreignKey: "program_id", 
+  as: "students" 
+});
+
+// Student -> Session
+Student.belongsTo(Session, { 
+  foreignKey: "session_id", 
+  // as: "Session"
+});
+
+Session.hasMany(Student, { 
+  foreignKey: "session_id", 
+  // as: "students" 
+});
+
+// Student -> Semester
+Student.belongsTo(Semester, { 
+  foreignKey: "semester_id", 
+  // as: "Semester"
+});
+
+Semester.hasMany(Student, { 
+  foreignKey: "semester_id", 
+  // as: "students" 
+});
+
+// Student -> Section
+Student.belongsTo(Section, { 
+  foreignKey: "section_id", 
+  // as: "Section"
+});
+
+Section.hasMany(Student, { 
+  foreignKey: "section_id", 
+  // as: "students" 
+});
+
+// ==================== END STUDENT ASSOCIATIONS ====================
+
 module.exports = {
   Menu,
   Submenu,
@@ -246,6 +326,8 @@ module.exports = {
   FeesDiscountsStatusTypes,
   FeesTypes,
   FeesCategoryFeesDiscount,
+  FeesFines,
+  FeesCategoryFeesFines,
   User,
   Role,
   UserRole,
