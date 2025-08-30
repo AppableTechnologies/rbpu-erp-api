@@ -1,9 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const {
-  getIdCards,
-  // getIdCardByStudentId
+  getAllIdCards,
 } = require("../../../controllers/admission/IdCards/IdCards_Controller");
-router.get("/", getIdCards);
-// router.get("/:id", getIdCardByStudentId);
+router.get("/", getAllIdCards);
 module.exports = router;
